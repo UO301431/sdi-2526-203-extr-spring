@@ -10,7 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\Users\\aleja\\Desktop\\geckodriver.exe";
+    static String Geckodriver = "C:\\geckodriver.exe";
 
     static WebDriver driver = getDriver(PathFirefox, Geckodriver);
     static String URL = "http://localhost:8090";
