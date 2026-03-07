@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <a class="navbar-brand" href="/home">Reservas de Espacios</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar"
+            aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="navbar-nav mr-auto">
+
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a class="nav-link" href="/home"><span>Inicio</span></a>
+            </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ESTANDAR')">
+                <a class="nav-link" href="/spaces">Espacios Disponibles</a>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ESTANDAR')">
+                <a class="nav-link" href="/reservations/my-reservations">Mis Reservas</a>
+            </li>
+
+            <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link dropdown-toggle" href="#" id="adminSpaces" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false"> Gestión de Espacios
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/admin/spaces/list">Ver Espacios</a>
+                    <a class="dropdown-item" href="/admin/spaces/add">Registrar Espacio</a>
+                </div>
+            </li>
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" href="/admin/reservations">Listado Global de Reservas</a>
+            </li>
+
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a class="nav-link" href="/profile/password">Cambiar Contraseña</a>
+            </li>
+        </ul>
+
+        <ul class="navbar-nav justify-content-end">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="btnLanguage" role="button" data-toggle="dropdown"
+                   aria-haspopup="true" aria-expanded="false">
+                    <span>Idioma</span>
+                </a>
+                <div id="languageDropdownMenuButton" class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" id="btnEnglish" value="en" href="?lang=en">
+                        <img th:src="@{/images/if_uk_flag.png}" style="border: 0; float: left; margin-right: 15px; width: 20px;"/>
+                        <span>Inglés</span>
+                    </a>
+                    <a class="dropdown-item" id="btnSpanish" value="es" href="?lang=es">
+                        <img th:src="@{/images/if_spain_flag.png}" style="border: 0; float: left; margin-right: 15px; width: 20px;"/>
+                        <span>Español</span>
+                    </a>
+                </div>
+            </li>
+
+            <li sec:authorize="!isAuthenticated()" class="nav-item">
+                <a class="nav-link" href="/signup">
+                    <i class='fas fa-user-alt' style='font-size:16px'></i>
+                    <span>Regístrate</span>
+                </a>
+            </li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item">
+                <a class="nav-link" href="/login">
+                    <i class='fas fa-sign-in-alt' style='font-size:16px'></i>
+                    <span>Iniciar sesión</span>
+                </a>
+            </li>
+
+            <li sec:authorize="isAuthenticated()" class="nav-item">
+                <a class="nav-link" href="/logout">
+                    <i class='fas fa-sign-out-alt' style='font-size:16px'></i>
+                    <span>Desconectar</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</nav>
