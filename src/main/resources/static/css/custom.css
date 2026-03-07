@@ -4,16 +4,17 @@ html {
     min-height: 100%;
 }
 body {
-    /* Margin bottom by footer height */
-    margin-bottom: 60px;
+    /* El margin-bottom debe ser igual al nuevo height del footer */
+    margin-bottom: 120px;
 }
 footer {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 60px;
+    height: 120px; /* Aumentado de 60px a 120px para que entren todas las líneas */
     background-color: #007bff;
-    text-align:center;
-    line-height:60px
+    text-align: center;
+    /* line-height: 60px;  <- ELIMINADO: esto rompía el texto en varias líneas */
+    padding-top: 15px; /* Añadido para centrar el texto verticalmente */
 }
 /* Sticky footer styles-------------------------------------------------- */
