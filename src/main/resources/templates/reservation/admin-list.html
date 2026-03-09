@@ -1,5 +1,5 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org"
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head th:replace="fragments/head"></head>
 <body>
@@ -8,7 +8,7 @@
 <div class="container" id="main-container">
     <h2>Listado Global de Reservas</h2>
 
-    <form class="form-inline" action="/admin/reservations" method="GET">
+    <form class="form-inline" action="/admin/reservations/list" method="GET">
         <div class="form-group">
             <label for="spaceId">Espacio:</label>
             <select name="spaceId" id="spaceId" class="form-control">
@@ -45,6 +45,7 @@
             let startDate = /*[[${param.startDate != null and !#lists.isEmpty(param.startDate) ? param.startDate[0] : ''}]]*/ '';
             let endDate = /*[[${param.endDate != null and !#lists.isEmpty(param.endDate) ? param.endDate[0] : ''}]]*/ '';
 
+            // Adaptado para coincidir con la convención de tu controlador
             let urlUpdate = '/admin/reservations/update?';
             if (page != null) urlUpdate += "page=" + page + "&";
             if (spaceId !== '') urlUpdate += "spaceId=" + spaceId + "&";
@@ -70,18 +71,18 @@
                 </thead>
                 <tbody>
                 <tr th:each="res : ${reservations}">
-                    <td>DNI - Nombre</td>
-                    <td>Nombre Espacio</td>
-                    <td>01/01/2026 10:00</td>
-                    <td>01/01/2026 12:00</td>
-                    <td>ACTIVA</td>
+                    <td th:text="${res.user.dni + ' - ' + res.user.name}">DNI - Nombre</td>
+                    <td th:text="${res.space.name}">Nombre Espacio</td>
+                    <td th:text="${#temporals.format(res.startDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
+                    <td th:text="${#temporals.format(res.endDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</td>
+                    <td th:text="${res.status}">ACTIVA</td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <div th:if="${#lists.isEmpty(reservations)}" class="alert alert-info">
+    <div th:if="${#lists.isEmpty(reservations)}" class="alert alert-info mt-3">
         No hay reservas que coincidan con los criterios de búsqueda.
     </div>
 
