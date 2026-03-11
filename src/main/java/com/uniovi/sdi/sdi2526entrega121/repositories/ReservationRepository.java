@@ -9,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ReservationRepository  extends CrudRepository<Reservation, Long>  {
 
@@ -26,4 +27,15 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                     @Param("startDate") LocalDateTime startDate,
                                     @Param("endDate") LocalDateTime endDate,
                                     Pageable pageable);
+
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE r.space.id = :spaceId  " +
+            "AND r.status = 'ACTIVE'  " +
+            "AND r.startDate < :endDate  " +
+            "AND r.endDate > :startDate")
+    List<Reservation> findActiveReservationsInRange(
+            @Param("spaceId") Long spaceId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }
