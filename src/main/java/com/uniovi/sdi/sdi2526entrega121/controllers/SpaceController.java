@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDateTime;
+
 @Controller
 public class SpaceController {
     private final SpaceService spaceService;
@@ -57,9 +59,6 @@ public class SpaceController {
 
     /**
      * Muestra la vista para seleccionar el rango de fechas a consultar
-     * @param model
-     * @param id
-     * @return
      */
     @GetMapping("space/availability/{id}")
     public String getAvailability(Model model, @PathVariable Long id){
@@ -67,5 +66,11 @@ public class SpaceController {
         return "space/availability";
     }
 
-
+    @GetMapping("/space/availability/info/{id}")
+    public String getAvailabilityInfo(Model model, @PathVariable Long id,
+                                      @RequestParam LocalDateTime startDate,
+                                      @RequestParam LocalDateTime endDate){
+        model.addAttribute("space", spaceService.getSpace(id));
+        return "space/availabilityInfo";
+    }
 }
