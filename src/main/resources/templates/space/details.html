@@ -1,0 +1,41 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/head"><title> Página de inicio</title></head>
+<body>
+
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2 th:text="${'Detalles del espacio ' + space.name}">Detalles</h2>
+    <div class="card">
+        <div class="card-header">Tipo</div>
+        <div class="card-body">
+            <p class="card-text" th:text="${space.type}">Tipo</p>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header">Ubicación</div>
+        <div class="card-body">
+            <p class="card-text" th:text="${space.location}">Tipo</p>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header">Capacidad</div>
+        <div class="card-body">
+            <p class="card-text" th:text="${space.capacity}">Tipo</p>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header">Activo</div>
+        <div class="card-body">
+            <p class="card-text" th:text="${space.active} ? 'Disponible' : 'No disponible'">Disponibilidad</p>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

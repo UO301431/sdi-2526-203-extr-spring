@@ -54,4 +54,11 @@ class Sdi2526Entrega121ApplicationTests {
     void PR27(){
         //TODO
     }
+
+    //Se accede a los detalles del primer espacio
+    @Test
+    @Order(28)
+    void PR28(){
+        //TODO
+    }
 }

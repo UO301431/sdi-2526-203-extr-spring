@@ -29,6 +29,7 @@
             <th scope="col">Tipo</th>
             <th scope="col">Ubicación</th>
             <th scope="col">Capacidad</th>
+            <th scope="col"></th>
         </tr>
         </thead>
         <tbody>
@@ -38,6 +39,9 @@
             <td th:text="${space.type}">dummy</td>
             <td th:text="${space.location}">dummy</td>
             <td th:text="${space.capacity}">dummy</td>
+            <td>
+                <a th:href="${'space/details/' + space.id}">Detalles</a>
+            </td>
         </tr>
         </tbody>
 
