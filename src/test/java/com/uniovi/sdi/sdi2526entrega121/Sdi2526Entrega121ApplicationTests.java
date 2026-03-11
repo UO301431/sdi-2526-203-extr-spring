@@ -4,6 +4,7 @@ import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.annotation.Order;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -38,5 +39,11 @@ class Sdi2526Entrega121ApplicationTests {
     @AfterAll
     static public void end() {
         driver.quit();
+    }
+
+    @Test
+    @Order(26)
+    void PR26(){
+        //TODO
     }
 }
