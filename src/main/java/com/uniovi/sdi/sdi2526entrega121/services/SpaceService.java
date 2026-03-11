@@ -37,4 +37,9 @@ public class SpaceService {
         searchType = "%" + searchType + "%";
         return spaceRepository.findActiveSpacesByTypeAndCapacity(pageable, searchType, searchCapacity);
     }
+
+    public Space getSpace(Long id) {
+        return spaceRepository.findById(id).isPresent()
+                ? spaceRepository.findById(id).get() : new Space();
+    }
 }
