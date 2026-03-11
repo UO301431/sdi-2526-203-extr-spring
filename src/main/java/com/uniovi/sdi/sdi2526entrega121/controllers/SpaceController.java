@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
@@ -46,5 +47,11 @@ public class SpaceController {
         model.addAttribute("availableSpaceList", activeSpace.getContent());
         model.addAttribute("page", activeSpace);
         return "space/list";
+    }
+
+    @GetMapping("space/details/{id}")
+    public String getDetail(Model model, @PathVariable Long id){
+        model.addAttribute("space", spaceService.getSpace(id));
+        return "space/details";
     }
 }

@@ -43,7 +43,15 @@ class Sdi2526Entrega121ApplicationTests {
 
     @Test
     @Order(26)
+    //Consultar el listado de espacios disponibles
     void PR26(){
+        //TODO
+    }
+
+    //Se aplica el filtro de capacidad con el valor 10
+    @Test
+    @Order(27)
+    void PR27(){
         //TODO
     }
 }
