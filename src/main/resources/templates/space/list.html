@@ -1,0 +1,36 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="fragments/head"> <title>Lista de Espacios</title> </head>
+<body>
+<!-- Barra de Navegación superior -->
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2>Espacios disponibles</h2>
+    <table class="table table-hover" id="availableSpaceTable">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Ubicación</th>
+            <th scope="col">Capacidad</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="space : ${availableSpaceList}">
+            <td th:text="${space.name}">dummy</td>
+            <td th:text="${space.type}">dummy</td>
+            <td th:text="${space.location}">dummy</td>
+            <td th:text="${space.capacity}">dummy</td>
+        </tr>
+        </tbody>
+
+    </table>
+
+</div>
+
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>
