@@ -22,4 +22,17 @@ public class SpaceService {
     public Page<Space> getActiveSpaces(Pageable pageable){
         return spaceRepository.findActiveSpaces(pageable);
     }
+
+    public Page<Space> getActiveSpacesByType(Pageable pageable, String searchType){
+        return spaceRepository.findActiveSpacesByType(pageable, searchType);
+    }
+
+    public Page<Space> getActiveSpacesByCapacity(Pageable pageable, Integer searchCapacity){
+        return spaceRepository.findActiveSpacesByCapacity(pageable, searchCapacity);
+
+    }
+
+    public  Page<Space> getActivSpacesByTypeAndCapacity(Pageable pageable, String searchType, Integer searchCapacity){
+        return spaceRepository.findActiveSpacesByTypeAndCapacity(pageable, searchType, searchCapacity);
+    }
 }

@@ -7,6 +7,20 @@
 
 <div class="container" id="main-container">
     <h2>Espacios disponibles</h2>
+    <form class="form-inline" action="/space/activeList">
+        <div class="form-group">
+            <label>
+                <input name="searchType" type="text" class="form-control" size="50"
+                       placeholder="Buscar por tipo de espacio">
+            </label>
+            <label>
+                <input name="searchCapacity" type="number" min="1" class="form-control" size="50"
+                       placeholder="Buscar por capacidad minima del espacio">
+            </label>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </div>
+    </form>
+
     <table class="table table-hover" id="availableSpaceTable">
         <thead>
         <tr>
