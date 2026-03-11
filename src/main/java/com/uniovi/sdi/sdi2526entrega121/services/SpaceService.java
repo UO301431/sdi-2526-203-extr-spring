@@ -24,6 +24,7 @@ public class SpaceService {
     }
 
     public Page<Space> getActiveSpacesByType(Pageable pageable, String searchType){
+        searchType = "%" + searchType + "%";
         return spaceRepository.findActiveSpacesByType(pageable, searchType);
     }
 
@@ -33,6 +34,7 @@ public class SpaceService {
     }
 
     public  Page<Space> getActivSpacesByTypeAndCapacity(Pageable pageable, String searchType, Integer searchCapacity){
+        searchType = "%" + searchType + "%";
         return spaceRepository.findActiveSpacesByTypeAndCapacity(pageable, searchType, searchCapacity);
     }
 }
