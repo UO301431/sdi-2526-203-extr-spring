@@ -61,20 +61,10 @@ public class ReservationsController {
                                      @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                      @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
-        LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
-
-        Page<Reservation> reservations;
-
-        if (spaceId == null && start == null && end == null) {
-            reservations = reservationsService.getReservations(pageable);
-        } else {
-            reservations = reservationsService.getFilteredReservations(spaceId, start, end, pageable);
-        }
+        Page<Reservation> reservations = getAdminReservationsPage(spaceId, startDate, endDate, pageable);
 
         model.addAttribute("reservations", reservations.getContent());
         model.addAttribute("page", reservations);
-
         model.addAttribute("spaces", spaceService.getSpaces(pageable));
 
         return "reservation/admin-list";
@@ -87,19 +77,22 @@ public class ReservationsController {
                                         @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                         @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
+        Page<Reservation> reservations = getAdminReservationsPage(spaceId, startDate, endDate, pageable);
+
+        model.addAttribute("reservations", reservations.getContent());
+        model.addAttribute("page", reservations); // Añadido para que el paginador también se actualice con AJAX
+
+        return "reservation/admin-list :: tableReservation";
+    }
+
+    private Page<Reservation> getAdminReservationsPage(Long spaceId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
         LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
 
-        Page<Reservation> reservations;
-
         if (spaceId == null && start == null && end == null) {
-            reservations = reservationsService.getReservations(pageable);
+            return reservationsService.getReservations(pageable);
         } else {
-            reservations = reservationsService.getFilteredReservations(spaceId, start, end, pageable);
+            return reservationsService.getFilteredReservations(spaceId, start, end, pageable);
         }
-
-        model.addAttribute("reservations", reservations.getContent());
-
-        return "reservation/admin-list :: tableReservation";
     }
 }
