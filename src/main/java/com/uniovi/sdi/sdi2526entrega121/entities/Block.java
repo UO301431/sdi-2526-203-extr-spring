@@ -13,9 +13,6 @@ public class Block {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
-    private String name;
-
     @ManyToOne
     @JoinColumn(name = "space_id", nullable = false)
     private Space space;
@@ -35,10 +32,9 @@ public class Block {
     public Block() {
     }
 
-    public Block(Long id, BlockStatus status, String name, Space space, LocalDateTime startDate, LocalDateTime endDate, String reason) {
+    public Block(Long id, BlockStatus status, Space space, LocalDateTime startDate, LocalDateTime endDate, String reason) {
         this.id = id;
         this.status = status;
-        this.name = name;
         this.space = space;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -51,14 +47,6 @@ public class Block {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Space getSpace() {
