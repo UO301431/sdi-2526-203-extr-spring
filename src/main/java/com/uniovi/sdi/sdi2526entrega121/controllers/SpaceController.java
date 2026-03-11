@@ -54,4 +54,18 @@ public class SpaceController {
         model.addAttribute("space", spaceService.getSpace(id));
         return "space/details";
     }
+
+    /**
+     * Muestra la vista para seleccionar el rango de fechas a consultar
+     * @param model
+     * @param id
+     * @return
+     */
+    @GetMapping("space/availability/{id}")
+    public String getAvailability(Model model, @PathVariable Long id){
+        model.addAttribute("space", spaceService.getSpace(id));
+        return "space/availability";
+    }
+
+
 }
