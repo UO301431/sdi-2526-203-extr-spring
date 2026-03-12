@@ -1,0 +1,52 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+  <h2 th:text="#{space.form.title.detail}">Detalle del Espacio</h2>
+
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title" th:text="${space.name}">Nombre</h5>
+
+      <table class="table table-borderless">
+        <tr>
+          <th th:text="#{space.field.type}">Tipo</th>
+          <td th:text="${space.type}">SALA</td>
+        </tr>
+        <tr>
+          <th th:text="#{space.field.location}">Ubicación</th>
+          <td th:text="${space.location}">Planta 1</td>
+        </tr>
+        <tr>
+          <th th:text="#{space.field.capacity}">Capacidad</th>
+          <td th:text="${space.capacity}">10</td>
+        </tr>
+        <tr>
+          <th th:text="#{space.field.description}">Descripción</th>
+          <td th:text="${space.description}">Sin descripción</td>
+        </tr>
+        <tr>
+          <th th:text="#{space.field.active}">Estado</th>
+          <td>
+                        <span th:if="${space.active}"
+                              class="badge bg-success"
+                              th:text="#{space.status.active}">Activo</span>
+            <span th:unless="${space.active}"
+                  class="badge bg-secondary"
+                  th:text="#{space.status.inactive}">Inactivo</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <a href="/spaces/list" class="btn btn-secondary mt-3"
+     th:text="#{common.back}">Volver</a>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

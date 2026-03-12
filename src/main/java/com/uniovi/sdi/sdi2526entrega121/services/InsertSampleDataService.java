@@ -1,9 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
-import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
-import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
-import com.uniovi.sdi.sdi2526entrega121.entities.Space;
-import com.uniovi.sdi.sdi2526entrega121.entities.User;
+import com.uniovi.sdi.sdi2526entrega121.entities.*;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import jakarta.annotation.PostConstruct;
@@ -59,10 +56,10 @@ public class InsertSampleDataService {
         // ==========================================
         // 2. CREAR ESPACIOS
         // ==========================================
-        Space space1 = new Space("Sala Ada Lovelace", "Sala de Reuniones", "Planta 1 - Edificio A", 10);
-        Space space2 = new Space("Laboratorio Alan Turing", "Laboratorio", "Planta 2 - Edificio B", 25);
-        Space space3 = new Space("Auditorio Grace Hopper", "Auditorio", "Planta Baja", 150);
-        Space space4 = new Space("Despacho 404", "Despacho", "Planta 4 - Edificio A", 4);
+        Space space1 = new Space("Sala Ada Lovelace", SpaceType.SALA, "Planta 1 - Edificio A", 10);
+        Space space2 = new Space("Laboratorio Alan Turing", SpaceType.AULA, "Planta 2 - Edificio B", 25);
+        Space space3 = new Space("Auditorio Grace Hopper", SpaceType.COWORK, "Planta Baja", 150);
+        Space space4 = new Space("Despacho 404", SpaceType.COWORK, "Planta 4 - Edificio A", 4);
 
         spaceRepository.save(space1);
         spaceRepository.save(space2);

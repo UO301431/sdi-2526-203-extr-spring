@@ -1,0 +1,114 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2 th:text="#{space.admin.list.title}">Gestión de Espacios</h2>
+
+    <div id="alertContainer"></div>
+
+    <a href="/admin/spaces/new" class="btn btn-success mb-3" th:text="#{space.admin.new.btn}">
+        Nuevo Espacio
+    </a>
+
+    <div class="table-responsive">
+        <div th:fragment="tableSpaces" id="tableSpaces">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th th:text="#{space.field.name}">Nombre</th>
+                    <th th:text="#{space.field.type}">Tipo</th>
+                    <th th:text="#{space.field.location}">Ubicación</th>
+                    <th th:text="#{space.field.capacity}">Capacidad</th>
+                    <th th:text="#{space.field.active}">Estado</th>
+                    <th th:text="#{space.field.actions}">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="space : ${spaces}" th:id="'space-row-' + ${space.id}">
+                    <td th:text="${space.name}">Sala A</td>
+                    <td th:text="${space.type}">SALA</td>
+                    <td th:text="${space.location}">Planta 1</td>
+                    <td th:text="${space.capacity}">10</td>
+                    <td>
+                        <span th:if="${space.active}"
+                              class="badge bg-success"
+                              th:text="#{space.status.active}">Activo</span>
+                        <span th:unless="${space.active}"
+                              class="badge bg-secondary"
+                              th:text="#{space.status.inactive}">Inactivo</span>
+                    </td>
+                    <td>
+                        <a th:href="@{/admin/spaces/edit/{id}(id=${space.id})}"
+                           class="btn btn-sm btn-primary"
+                           th:text="#{space.action.edit}">Editar</a>
+
+                        <button type="button"
+                                class="btn btn-sm btn-toggle"
+                                th:classappend="${space.active} ? 'btn-warning' : 'btn-success'"
+                                th:text="${space.active} ? #{space.action.deactivate} : #{space.action.activate}"
+                                th:attr="data-id=${space.id}">
+                            Desactivar
+                        </button>
+
+                        <a th:href="@{/admin/blocks/list/{id}(id=${space.id})}"
+                           class="btn btn-sm btn-info"
+                           th:text="#{space.action.blocks}">Bloqueos</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${#lists.isEmpty(spaces)}" class="alert alert-info">
+                <span th:text="#{space.admin.list.empty}">No hay espacios registrados.</span>
+            </div>
+        </div>
+        <!-- ↑ cierra el fragmento tableSpaces -->
+    </div>
+    <!-- ↑ cierra table-responsive -->
+
+    <!-- Paginación fuera del fragmento — no se toca en el AJAX -->
+    <footer th:replace="fragments/pagination"></footer>
+
+</div>
+<!-- ↑ cierra main-container -->
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).on("click", ".btn-toggle", function () {
+        var spaceId = $(this).attr("data-id");
+
+        $.ajax({
+            url: "/admin/spaces/toggle/" + spaceId,
+            type: "POST",
+            success: function (html) {
+                $("#tableSpaces").replaceWith(html);
+
+                $("#alertContainer").html(
+                    '<div class="alert alert-success alert-dismissible">' +
+                    'Estado actualizado correctamente.' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>' +
+                    '</div>'
+                );
+
+                setTimeout(function () {
+                    $("#alertContainer").html("");
+                }, 3000);
+            },
+            error: function () {
+                $("#alertContainer").html(
+                    '<div class="alert alert-danger">Error al actualizar el espacio.</div>'
+                );
+            }
+        });
+    });
+    /*]]>*/
+</script>
+
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

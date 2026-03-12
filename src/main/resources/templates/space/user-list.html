@@ -1,0 +1,66 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+  <h2 th:text="#{space.user.list.title}">Espacios Disponibles</h2>
+
+  <form class="form-inline mb-3" action="/spaces/list" method="GET">
+    <div class="form-group me-2">
+      <label for="type" th:text="#{space.field.type}">Tipo:</label>
+      <select name="type" id="type" class="form-control">
+        <option value="" th:text="#{common.all}">Todos</option>
+        <option th:each="t : ${spaceTypes}"
+                th:value="${t.name()}"
+                th:text="${t.name()}"
+                th:selected="${selectedType != null and selectedType == t}">
+        </option>
+      </select>
+    </div>
+    <div class="form-group me-2">
+      <label for="minCapacity" th:text="#{space.field.minCapacity}">Cap. mínima:</label>
+      <input type="number" name="minCapacity" id="minCapacity" class="form-control"
+             th:value="${minCapacity}" min="1" style="width:80px"/>
+    </div>
+    <button type="submit" class="btn btn-primary" th:text="#{common.filter}">Filtrar</button>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover" id="spacesTable">
+      <thead>
+      <tr>
+        <th th:text="#{space.field.name}">Nombre</th>
+        <th th:text="#{space.field.type}">Tipo</th>
+        <th th:text="#{space.field.location}">Ubicación</th>
+        <th th:text="#{space.field.capacity}">Capacidad</th>
+        <th th:text="#{space.field.actions}">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="space : ${spaces}">
+        <td th:text="${space.name}">Sala A</td>
+        <td th:text="${space.type}">SALA</td>
+        <td th:text="${space.location}">Planta 1</td>
+        <td th:text="${space.capacity}">10</td>
+        <td>
+          <a th:href="@{/spaces/detail/{id}(id=${space.id})}"
+             class="btn btn-sm btn-info"
+             th:text="#{space.action.detail}">Ver Detalle</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${#lists.isEmpty(spaces)}" class="alert alert-info">
+    <span th:text="#{space.user.list.empty}">No hay espacios disponibles.</span>
+  </div>
+
+  <footer th:replace="fragments/pagination"></footer>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>
