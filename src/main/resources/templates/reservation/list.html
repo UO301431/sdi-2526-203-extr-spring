@@ -81,6 +81,7 @@
                     <th>Inicio</th>
                     <th>Fin</th>
                     <th>Estado</th>
+                    <th sec:authorize="hasRole('ROLE_EMPLOYEE')">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -90,6 +91,16 @@
                     <td th:text="${#temporals.format(res.startDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
                     <td th:text="${#temporals.format(res.endDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</td>
                     <td th:text="${res.status}">ACTIVA</td>
+                    <td sec:authorize="hasRole('ROLE_EMPLOYEE')">
+                        <a th:if="${res.status.name() == 'ACTIVE'}"
+                           th:href="@{'/reservations/cancel/' + ${res.id}}"
+                           class="btn btn-danger btn-sm">Cancelar</a>
+
+                        <a th:unless="${res.status.name() == 'ACTIVE'}"
+                           href="#"
+                           class="btn btn-secondary btn-sm disabled"
+                           aria-disabled="true">Cancelada</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>

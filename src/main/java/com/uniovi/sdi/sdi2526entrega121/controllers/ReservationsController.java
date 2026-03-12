@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -71,5 +72,14 @@ public class ReservationsController {
         model.addAttribute("page", reservations);
 
         return "reservation/list :: tableReservation";
+    }
+
+    @RequestMapping(value = "/reservations/cancel/{id}")
+    public String cancelReservation(@PathVariable Long id, Principal principal) {
+        String dni = principal.getName();
+
+        reservationsService.cancelReservation(id, dni);
+
+        return "redirect:/reservations/list";
     }
 }

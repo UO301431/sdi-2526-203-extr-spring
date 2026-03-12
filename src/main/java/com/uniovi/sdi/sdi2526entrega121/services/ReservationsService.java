@@ -35,4 +35,16 @@ public class ReservationsService {
         }
         return Page.empty();
     }
+
+    public void cancelReservation(Long reservationId, String dni) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElse(null);
+
+        if (reservation != null) {
+            if (reservation.getUser().getDni().equals(dni)) {
+                reservation.setStatus(ReservationStatus.CANCELLED);
+
+                reservationRepository.save(reservation);
+            }
+        }
+    }
 }
