@@ -33,26 +33,17 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/spaces/**", "/reservations/**", "/profile/**").hasAnyRole("ADMIN", "ESTANDAR")
-                        .requestMatchers("/login", "/signup", "/css/**", "/js/**", "/images/**").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
-                        .usernameParameter("dni")
-                        .passwordParameter("password")
-                        .defaultSuccessUrl("/spaces/list", false)
-                        .failureUrl("/login?error=true")
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login")
-                        .permitAll()
-                );
+                        .defaultSuccessUrl("/home", true)
+                        .permitAll())
+                .logout((logout) -> logout
+                    .logoutUrl("/logout").permitAll())
+                .securityContext(securityContext -> securityContext
+                        .requireExplicitSave(true));
 
         return http.build();
     }
