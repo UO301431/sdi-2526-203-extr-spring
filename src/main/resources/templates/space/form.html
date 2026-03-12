@@ -1,0 +1,60 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2 th:text="#{space.form.title.new}">Registrar Nuevo Espacio</h2>
+
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <form th:action="@{/spaces/new}" th:object="${space}" method="post">
+
+        <div class="form-group mb-3">
+            <label for="name" th:text="#{space.field.name}">Nombre</label>
+            <input type="text" id="name" name="name" class="form-control"
+                   th:value="${space.name}" required/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="type" th:text="#{space.field.type}">Tipo</label>
+            <select id="type" name="type" class="form-control" required>
+                <option th:each="t : ${spaceTypes}"
+                        th:value="${t.name()}"
+                        th:text="${t.name()}"
+                        th:selected="${space.type == t}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="location" th:text="#{space.field.location}">Ubicación</label>
+            <input type="text" id="location" name="location" class="form-control"
+                   th:value="${space.location}" required/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="capacity" th:text="#{space.field.capacity}">Capacidad</label>
+            <input type="number" id="capacity" name="capacity" class="form-control"
+                   th:value="${space.capacity != 0 ? space.capacity : 1}" min="1" required/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="description" th:text="#{space.field.description}">Descripción</label>
+            <textarea id="description" name="description" class="form-control" rows="3"
+                      th:text="${space.description}"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-success" th:text="#{space.form.submit.new}">
+            Crear Espacio
+        </button>
+        <a href="/spaces/list" class="btn btn-secondary" th:text="#{common.cancel}">
+            Cancelar
+        </a>
+    </form>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

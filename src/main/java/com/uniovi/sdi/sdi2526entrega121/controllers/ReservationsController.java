@@ -2,7 +2,6 @@ package com.uniovi.sdi.sdi2526entrega121.controllers;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
-import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
@@ -12,6 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -36,75 +38,54 @@ public class ReservationsController {
     }
 
     @RequestMapping(value = "/reservations/list")
-    public String getOwnReservations(Model model,
-                                     Pageable pageable,
-                                     Principal principal,
-                                     @RequestParam(value = "status", required = false) ReservationStatus status) {
+    public String getReservations(Model model, Pageable pageable, Principal principal,
+                                  @RequestParam(value = "spaceId", required = false) Long spaceId,
+                                  @RequestParam(value = "status", required = false) ReservationStatus status,
+                                  @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                  @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        // String dni = principal.getName();
-        String dni = "10000001S";
+        String dni = principal.getName();
 
-        Page<Reservation> reservations;
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
 
-        if (status != null) {
-            reservations = reservationsService.getReservationsByUserAndStatus(dni, status, pageable);
-        } else {
-            reservations = reservationsService.getReservationsByUser(dni, pageable);
-        }
+        Page<Reservation> reservations = reservationsService.getFilteredReservations(dni, status, spaceId, start, end, pageable);
 
-        model.addAttribute("reservationList", reservations.getContent());
+        model.addAttribute("reservations", reservations.getContent());
         model.addAttribute("page", reservations);
+        model.addAttribute("spaces", spaceService.getSpaces(pageable));
         model.addAttribute("statuses", ReservationStatus.values());
 
-        return "reservation/user-list";
+        return "reservation/list";
     }
 
-    @RequestMapping(value = "/admin/reservations/list")
-    public String getAllReservations(Model model, Pageable pageable,
+    @RequestMapping(value = "/reservations/update")
+    public String updateReservations(Model model, Pageable pageable, Principal principal,
                                      @RequestParam(value = "spaceId", required = false) Long spaceId,
+                                     @RequestParam(value = "status", required = false) ReservationStatus status,
                                      @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                      @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
+        String dni = principal.getName();
+
         LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
         LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
 
-        Page<Reservation> reservations;
-
-        if (spaceId == null && start == null && end == null) {
-            reservations = reservationsService.getReservations(pageable);
-        } else {
-            reservations = reservationsService.getFilteredReservations(spaceId, start, end, pageable);
-        }
+        Page<Reservation> reservations = reservationsService.getFilteredReservations(dni, status, spaceId, start, end, pageable);
 
         model.addAttribute("reservations", reservations.getContent());
         model.addAttribute("page", reservations);
 
-        model.addAttribute("spaces", spaceService.getSpaces(pageable));
-
-        return "reservation/admin-list";
+        return "reservation/list :: tableReservation";
     }
 
-    @RequestMapping(value = "/admin/reservations/update")
-    public String updateAllReservations(Model model,
-                                        Pageable pageable,
-                                        @RequestParam(value = "spaceId", required = false) Long spaceId,
-                                        @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                        @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    @RequestMapping(value = "/reservations/cancel/{id}")
+    public String cancelReservation(@PathVariable Long id, Principal principal) {
+        String dni = principal.getName();
 
-        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
-        LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
+        reservationsService.cancelReservation(id, dni);
 
-        Page<Reservation> reservations;
-
-        if (spaceId == null && start == null && end == null) {
-            reservations = reservationsService.getReservations(pageable);
-        } else {
-            reservations = reservationsService.getFilteredReservations(spaceId, start, end, pageable);
-        }
-
-        model.addAttribute("reservations", reservations.getContent());
-
-        return "reservation/admin-list :: tableReservation";
+        return "redirect:/reservations/list";
     }
 
     /**
