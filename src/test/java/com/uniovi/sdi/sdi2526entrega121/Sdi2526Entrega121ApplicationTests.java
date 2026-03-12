@@ -338,29 +338,32 @@ class Sdi2526Entrega121ApplicationTests {
         driver.navigate().to(URL + "/admin/spaces/list");
 
         WebElement blocksLink = driver.findElement(
-                By.cssSelector("a[href*='/admin/blocks/list/']")
+            By.cssSelector("a[href*='/admin/blocks/list/']")
         );
-        // Extrae el id numérico del espacio de esa URL
-        // Ej: "http://localhost:8090/admin/blocks/list/3" → "3"
         String spaceId = blocksLink.getAttribute("href")
-                .replaceAll(".*/
+            .replaceAll(".*/
         /*
         admin/blocks/list/(\\d+).*", "$1");
 
+                // Paso 1: crea su propio bloqueo base, independiente de prueba 19
+                driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
+        driver.findElement(By.id("startDate")).sendKeys("2099-07-01T09:00");
+        driver.findElement(By.id("endDate")).sendKeys("2099-07-01T18:00");
+        driver.findElement(By.id("reason")).sendKeys("Bloqueo base prueba 20");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
+        // Paso 2: intenta crear un bloqueo solapado
         driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
-
-        // Misma franja que el bloqueo creado en la prueba 19 → debe solapar
-        driver.findElement(By.id("startDate")).sendKeys("2099-06-01T10:00");
-        driver.findElement(By.id("endDate")).sendKeys("2099-06-01T17:00");
+        driver.findElement(By.id("startDate")).sendKeys("2099-07-01T10:00");
+        driver.findElement(By.id("endDate")).sendKeys("2099-07-01T17:00");
         driver.findElement(By.id("reason")).sendKeys("Bloqueo solapado");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
                 bodyText().contains("solapa") || bodyText().contains("overlap")
-                        || bodyText().contains("bloqueo"),
-                "Bloqueo solapado con otro activo debe mostrar error"
-        );
+                || bodyText().contains("bloqueo"),
+            "Bloqueo solapado con otro activo debe mostrar error"
+                    );
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
