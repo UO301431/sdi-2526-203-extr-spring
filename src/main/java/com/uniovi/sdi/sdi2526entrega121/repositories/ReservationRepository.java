@@ -14,16 +14,27 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
 
     Page<Reservation> findAll(Pageable pageable);
 
-    Page<Reservation> findByUserDni(String dni, Pageable pageable);
-
-    Page<Reservation> findByUserDniAndStatus(String dni, ReservationStatus status, Pageable pageable);
-
     @Query("SELECT r FROM Reservation r WHERE " +
+            "(:status IS NULL OR r.status = :status) AND " +
             "(cast(:spaceId as long) IS NULL OR r.space.id = :spaceId) AND " +
             "(cast(:startDate as timestamp) IS NULL OR r.startDate >= :startDate) AND " +
             "(cast(:endDate as timestamp) IS NULL OR r.endDate <= :endDate)")
-    Page<Reservation> findByFilters(@Param("spaceId") Long spaceId,
+    Page<Reservation> findByFilters(@Param("status") ReservationStatus status,
+                                    @Param("spaceId") Long spaceId,
                                     @Param("startDate") LocalDateTime startDate,
                                     @Param("endDate") LocalDateTime endDate,
                                     Pageable pageable);
+
+    @Query("SELECT r FROM Reservation r WHERE " +
+            "(r.user.id = :userId) AND " +
+            "(:status IS NULL OR r.status = :status) AND " +
+            "(cast(:spaceId as long) IS NULL OR r.space.id = :spaceId) AND " +
+            "(cast(:startDate as timestamp) IS NULL OR r.startDate >= :startDate) AND " +
+            "(cast(:endDate as timestamp) IS NULL OR r.endDate <= :endDate)")
+    Page<Reservation> findByUserAndFilters(@Param("userId") Long userId,
+                                           @Param("status") ReservationStatus status,
+                                           @Param("spaceId") Long spaceId,
+                                           @Param("startDate") LocalDateTime startDate,
+                                           @Param("endDate") LocalDateTime endDate,
+                                           Pageable pageable);
 }
