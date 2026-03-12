@@ -50,19 +50,25 @@ public class SpaceService {
 
 
     public String addSpace(Space space) {
+        // Validar nombre no vacío
         if (space.getName() == null || space.getName().trim().isEmpty()) {
             return "space.error.name.empty";
         }
-        if (space.getCapacity() < 1) {
+        // Validar capacidad
+        if (space.getCapacity() == null || space.getCapacity() < 1) {
             return "space.error.capacity.invalid";
         }
-        if (spaceRepository.findActiveByNameExcluding(space.getName().trim(), null).isPresent()) {
-            return "space.error.name.duplicate";
+        // Validar nombre duplicado entre espacios activos
+        Optional<Space> existing = spaceRepository.findActiveByNameExcluding(
+                space.getName().trim(), -1L
+        );
+        if (!existing.isEmpty()) {
+            //TODO cambiar cuando este internacionalizado
+            //return "space.error.name.duplicate";
+            return "duplicado";
         }
-        space.setName(space.getName().trim());
-        space.setActive(true);
+
         spaceRepository.save(space);
-        log.info("Space created: {}", space.getName());
         return null;
     }
 
@@ -76,7 +82,9 @@ public class SpaceService {
             return "space.error.name.empty";
         }
         if (updated.getCapacity() < 1) {
-            return "space.error.capacity.invalid";
+            //TODO cambiar cuando este internacionalizado
+            //return "space.error.capacity.invalid";
+            return "capacidad";
         }
         if (spaceRepository.findActiveByNameExcluding(updated.getName().trim(), id).isPresent()) {
             return "space.error.name.duplicate";

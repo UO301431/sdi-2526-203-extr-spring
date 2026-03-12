@@ -65,21 +65,27 @@ public class MaintenanceBlockService {
 
         Optional<Space> spaceOpt = spaceRepository.findById(spaceId);
         if (spaceOpt.isEmpty()) {
+
             return "block.error.space.notfound";
+
         }
 
         // Check overlap with other active blocks
         List<MaintenanceBlock> blockOverlaps =
                 blockRepository.findOverlappingActiveBlocks(spaceId, start, end, null);
         if (!blockOverlaps.isEmpty()) {
-            return "block.error.overlap.block";
+            //TODO cambiar cuando este internacionalizado
+            //return "block.error.overlap.block";
+            return "bloqueo";
         }
 
         // Check overlap with active reservations
         boolean reservationOverlap = reservationRepository
                 .existsActiveOverlap(spaceId, start, end, ReservationStatus.ACTIVE);
         if (reservationOverlap) {
-            return "block.error.overlap.reservation";
+            //TODO cambiar cuando este internacionalizado
+            //return "block.error.overlap.reservation";
+            return "reserva";
         }
 
         MaintenanceBlock block = new MaintenanceBlock(spaceOpt.get(), start, end, reason.trim());
