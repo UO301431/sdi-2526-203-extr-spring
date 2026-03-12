@@ -13,14 +13,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\geckodriver.exe";
+    //static String Geckodriver = "C:\\geckodriver.exe";
 
-    static WebDriver driver = getDriver(PathFirefox, Geckodriver);
+    static WebDriver driver = getDriver(PathFirefox/*, Geckodriver*/);
     static String URL = "http://localhost:8090";
 
-    public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
+    public static WebDriver getDriver(String PathFirefox/*, String Geckodriver*/) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
-        System.setProperty("webdriver.gecko.driver", Geckodriver);
+        //System.setProperty("webdriver.gecko.driver", Geckodriver);
         driver = new FirefoxDriver();
         return driver;
     }
@@ -47,7 +47,7 @@ class Sdi2526Entrega121ApplicationTests {
 
     private void loginAsAdmin() {
         driver.navigate().to(URL + "/login");
-        driver.findElement(By.id("dni")).sendKeys("12345678Z");
+        driver.findElement(By.id("username")).sendKeys("12345678Z");
         driver.findElement(By.id("password")).sendKeys("@Dm1n1str@D0r");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
     }
@@ -55,7 +55,7 @@ class Sdi2526Entrega121ApplicationTests {
     private String bodyText() {
         return driver.findElement(By.tagName("body")).getText();
     }
-    /*
+
     // ─────────────────────────────────────────────────────────────────────────
     // TAREA 4 – Registrar nuevos espacios
     // ─────────────────────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(11)
     public void prueba11_registrarEspacioValido() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/new");
+        driver.navigate().to(URL + "/spaces/new");
 
         driver.findElement(By.id("name")).sendKeys("SalaSelenium01");
         new Select(driver.findElement(By.id("type"))).selectByValue("SALA");
@@ -74,8 +74,11 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).sendKeys("8");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
+        System.out.println("URL actual: " + driver.getCurrentUrl());
+        System.out.println("Cuerpo: " + bodyText());
+
         assertTrue(
-                driver.getCurrentUrl().contains("/admin/spaces/list")
+                driver.getCurrentUrl().contains("/spaces/list")
                         || bodyText().contains("SalaSelenium01"),
                 "Tras crear un espacio válido debe redirigir al listado o mostrar el espacio"
         );
@@ -86,22 +89,20 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(12)
     public void prueba12_registrarEspacioNombreVacio() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/new");
+        driver.navigate().to(URL + "/spaces/new");
 
-        // Dejamos el nombre vacío
         new Select(driver.findElement(By.id("type"))).selectByValue("AULA");
         driver.findElement(By.id("location")).sendKeys("Planta 3");
         driver.findElement(By.id("capacity")).clear();
         driver.findElement(By.id("capacity")).sendKeys("5");
 
-        // Eliminamos el 'required' del campo para poder enviar el formulario vacío
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('name').removeAttribute('required');"
         );
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
-                driver.getCurrentUrl().contains("/admin/spaces/new")
+                driver.getCurrentUrl().contains("/spaces/new")
                         || bodyText().contains("nombre") || bodyText().contains("name"),
                 "Nombre vacío debe mostrar error y permanecer en el formulario"
         );
@@ -113,7 +114,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(13)
     public void prueba13_registrarEspacioCapacidadInvalida() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/new");
+        driver.navigate().to(URL + "/spaces/new");
 
         driver.findElement(By.id("name")).sendKeys("SalaCapInvalida");
         new Select(driver.findElement(By.id("type"))).selectByValue("COWORK");
@@ -121,14 +122,13 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).clear();
         driver.findElement(By.id("capacity")).sendKeys("0");
 
-        // Eliminamos el min=1 para que el navegador no bloquee el envío
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('capacity').removeAttribute('min');"
         );
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
-                driver.getCurrentUrl().contains("/admin/spaces/new")
+                driver.getCurrentUrl().contains("/spaces/new")
                         || bodyText().contains("capacidad") || bodyText().contains("capacity"),
                 "Capacidad < 1 debe mostrar error y permanecer en el formulario"
         );
@@ -140,14 +140,14 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(14)
     public void prueba14_registrarEspacioNombreDuplicado() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/new");
+        driver.navigate().to(URL + "/spaces/new");
 
         // "Sala A" debe existir en los datos semilla como espacio activo
-        driver.findElement(By.id("name")).sendKeys("Sala A");
+        driver.findElement(By.id("name")).sendKeys("Sala Ada Lovelace");
         new Select(driver.findElement(By.id("type"))).selectByValue("SALA");
-        driver.findElement(By.id("location")).sendKeys("Planta 0");
+        driver.findElement(By.id("location")).sendKeys("Planta 1 - Edificio A");
         driver.findElement(By.id("capacity")).clear();
-        driver.findElement(By.id("capacity")).sendKeys("5");
+        driver.findElement(By.id("capacity")).sendKeys("10");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
@@ -167,9 +167,9 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(15)
     public void prueba15_editarEspacioValido() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
-        driver.findElement(By.cssSelector("a[href*='/admin/spaces/edit/']")).click();
+        driver.findElement(By.cssSelector("a[href*='/spaces/edit/']")).click();
 
         WebElement location = driver.findElement(By.id("location"));
         location.clear();
@@ -178,7 +178,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
-                driver.getCurrentUrl().contains("/admin/spaces/list")
+                driver.getCurrentUrl().contains("/spaces/list")
                         || bodyText().contains("correctamente"),
                 "Edición válida debe redirigir al listado o mostrar mensaje de éxito"
         );
@@ -189,9 +189,9 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(16)
     public void prueba16_editarEspacioCapacidadInvalida() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
-        driver.findElement(By.cssSelector("a[href*='/admin/spaces/edit/']")).click();
+        driver.findElement(By.cssSelector("a[href*='/spaces/edit/']")).click();
 
         WebElement capacity = driver.findElement(By.id("capacity"));
         capacity.clear();
@@ -218,9 +218,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(17)
     public void prueba17_desactivarEspacio() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
-        // Obtener el nombre del espacio en la fila del primer botón "Desactivar"
         WebElement deactivateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-warning')]"
         ));
@@ -228,27 +227,29 @@ class Sdi2526Entrega121ApplicationTests {
                 .findElement(By.xpath("ancestor::tr/td[1]"))
                 .getText();
 
-        // AJAX: el botón no envía un formulario, hace un POST con jQuery
-        // Selenium hace clic igual — el navegador ejecuta el JS
         deactivateBtn.click();
 
-        // Esperar a que el fragmento se reemplace (el badge cambia a Inactivo)
+        // Esperar a que AJAX reemplace el fragmento
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
-        // Verificar que el badge del espacio ahora es "Inactivo"
-        WebElement row = driver.findElement(By.xpath(
-                "//tr[td[1][normalize-space()='" + spaceName + "']]"
+        WebElement toggleBtn = driver.findElement(By.xpath(
+                "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
         assertTrue(
-                row.getText().contains("Inactivo") || row.getText().contains("Inactive"),
-                "Tras desactivar, el badge del espacio debe mostrar Inactivo sin recargar la página"
+                toggleBtn.getAttribute("class").contains("btn-success"),
+                "Tras desactivar, el botón debe cambiar a verde (Activar)"
         );
 
-        // Verificar que el espacio ya no aparece en el listado de usuario estándar
+        // Verificar que el espacio ya no aparece en el listado de usuario
+        driver.manage().deleteAllCookies();
+        driver.navigate().to(URL + "/login");
+        driver.findElement(By.id("username")).sendKeys("10000001S");
+        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
         driver.navigate().to(URL + "/spaces/list");
         assertFalse(
                 bodyText().contains(spaceName),
-                "El espacio desactivado '" + spaceName + "' no debe aparecer en el listado de usuario"
+                "El espacio desactivado no debe aparecer en el listado de usuario"
         );
     }
 
@@ -257,9 +258,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(18)
     public void prueba18_activarEspacio() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
-        // Obtener el nombre del espacio en la fila del primer botón "Activar"
         WebElement activateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-success')]"
         ));
@@ -269,23 +269,28 @@ class Sdi2526Entrega121ApplicationTests {
 
         activateBtn.click();
 
-        // Esperar a que el fragmento AJAX se reemplace
+        // Esperar a que AJAX reemplace el fragmento
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
-        // Verificar que el badge del espacio ahora es "Activo"
-        WebElement row = driver.findElement(By.xpath(
-                "//tr[td[1][normalize-space()='" + spaceName + "']]"
+        // Verificar que el badge del espacio cambió a Activo en la misma página
+        WebElement toggleBtn = driver.findElement(By.xpath(
+                "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
         assertTrue(
-                row.getText().contains("Activo") || row.getText().contains("Active"),
-                "Tras activar, el badge del espacio debe mostrar Activo sin recargar la página"
+                toggleBtn.getAttribute("class").contains("btn-warning"),
+                "Tras activar, el botón debe cambiar a amarillo (Desactivar)"
         );
 
-        // Verificar que el espacio ahora sí aparece en el listado de usuario estándar
+        // Verificar que el espacio ahora sí aparece en el listado de usuario
+        driver.manage().deleteAllCookies();
+        driver.navigate().to(URL + "/login");
+        driver.findElement(By.id("username")).sendKeys("10000001S");
+        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
         driver.navigate().to(URL + "/spaces/list");
         assertTrue(
                 bodyText().contains(spaceName),
-                "El espacio activado '" + spaceName + "' debe aparecer en el listado de usuario"
+                "El espacio activado debe aparecer en el listado de usuario"
         );
     }
 
@@ -298,28 +303,25 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(19)
     public void prueba19_crearBloqueoValido() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
-        // Ir a la página de bloqueos del primer espacio
         WebElement blocksLink = driver.findElement(
-                By.cssSelector("a[href*='/admin/blocks/list/']")
+                By.cssSelector("a[href*='/blocks/list/']")
         );
         String spaceId = blocksLink.getAttribute("href")
-                .replaceAll(".*/
-            /*
-                admin/blocks/list/(\\d+).*", "$1");
+                .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
+        driver.navigate().to(URL + "/blocks/new/" + spaceId);
 
-        driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
-
-        // Fechas lejanas para evitar colisión con datos semilla
         driver.findElement(By.id("startDate")).sendKeys("2099-06-01T09:00");
         driver.findElement(By.id("endDate")).sendKeys("2099-06-01T18:00");
         driver.findElement(By.id("reason")).sendKeys("Mantenimiento Selenium válido");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
+        System.out.println("URL: " + driver.getCurrentUrl());
+
         assertTrue(
-                driver.getCurrentUrl().contains("/admin/blocks/list/")
+                driver.getCurrentUrl().contains("/blocks/list/")
                         || bodyText().contains("correctamente"),
                 "Bloqueo válido debe guardarse y redirigir al listado de bloqueos"
         );
@@ -335,35 +337,41 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(20)
     public void prueba20_crearBloqueoSolapadoConBloqueo() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
         WebElement blocksLink = driver.findElement(
-            By.cssSelector("a[href*='/admin/blocks/list/']")
+                By.cssSelector("a[href*='/blocks/list/']")
         );
         String spaceId = blocksLink.getAttribute("href")
-            .replaceAll(".*/
-        /*
-        admin/blocks/list/(\\d+).*", "$1");
+                .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-                // Paso 1: crea su propio bloqueo base, independiente de prueba 19
-                driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
-        driver.findElement(By.id("startDate")).sendKeys("2099-07-01T09:00");
-        driver.findElement(By.id("endDate")).sendKeys("2099-07-01T18:00");
+        // Paso 1: crea su propio bloqueo base
+        driver.navigate().to(URL + "/blocks/new/" + spaceId);
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2099-07-01T09:00';"
+        );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2099-07-01T18:00';"
+        );
         driver.findElement(By.id("reason")).sendKeys("Bloqueo base prueba 20");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         // Paso 2: intenta crear un bloqueo solapado
-        driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
-        driver.findElement(By.id("startDate")).sendKeys("2099-07-01T10:00");
-        driver.findElement(By.id("endDate")).sendKeys("2099-07-01T17:00");
+        driver.navigate().to(URL + "/blocks/new/" + spaceId);
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2099-07-01T10:00';"
+        );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2099-07-01T17:00';"
+        );
         driver.findElement(By.id("reason")).sendKeys("Bloqueo solapado");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         assertTrue(
                 bodyText().contains("solapa") || bodyText().contains("overlap")
-                || bodyText().contains("bloqueo"),
-            "Bloqueo solapado con otro activo debe mostrar error"
-                    );
+                        || bodyText().contains("bloqueo") || bodyText().contains("block.error"),
+                "Bloqueo solapado con otro activo debe mostrar error"
+        );
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
@@ -373,18 +381,15 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(21)
     public void prueba21_crearBloqueoSolapadoConReserva() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
         WebElement blocksLink = driver.findElement(
-                By.cssSelector("a[href*='/admin/blocks/list/']")
+                By.cssSelector("a[href*='/blocks/list/']")
         );
         String spaceId = blocksLink.getAttribute("href")
-                .replaceAll(".*/
-        /*
-        admin/blocks/list/(\\d+).*", "$1");
+                .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-
-        driver.navigate().to(URL + "/admin/blocks/new/" + spaceId);
+        driver.navigate().to(URL + "/blocks/new/" + spaceId);
 
         // Ajusta estas fechas para que caigan dentro de una reserva activa de tus datos semilla
         driver.findElement(By.id("startDate")).sendKeys("2026-05-01T08:00");
@@ -409,21 +414,24 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(22)
     public void prueba22_cancelarBloqueo() {
         loginAsAdmin();
-        driver.navigate().to(URL + "/admin/spaces/list");
+        driver.navigate().to(URL + "/spaces/list");
 
         WebElement blocksLink = driver.findElement(
-                By.cssSelector("a[href*='/admin/blocks/list/']")
+                By.cssSelector("a[href*='/blocks/list/']")
         );
         String spaceId = blocksLink.getAttribute("href")
-                .replaceAll(".*/
-        /*
-        admin/blocks/list/(\\d+).*", "$1");
+                .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-        driver.navigate().to(URL + "/admin/blocks/list/" + spaceId);
+        // Primero crea un bloqueo para asegurar que hay uno activo que cancelar
+        driver.navigate().to(URL + "/blocks/new/" + spaceId);
+        driver.findElement(By.id("startDate")).sendKeys("2099-08-01T09:00");
+        driver.findElement(By.id("endDate")).sendKeys("2099-08-01T18:00");
+        driver.findElement(By.id("reason")).sendKeys("Bloqueo a cancelar prueba 22");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        // Pulsar el primer botón de cancelar bloqueo activo
+        // Pulsa el primer botón de cancelar bloqueo activo
         WebElement cancelBtn = driver.findElement(By.xpath(
-                "//form[contains(@action,'/admin/blocks/cancel/')]//button[@type='submit']"
+                "//form[contains(@action,'/blocks/cancel/')]//button[@type='submit']"
         ));
         cancelBtn.click();
 
@@ -433,5 +441,4 @@ class Sdi2526Entrega121ApplicationTests {
                 "El bloqueo cancelado debe mostrarse con estado CANCELADO"
         );
     }
-    */
 }

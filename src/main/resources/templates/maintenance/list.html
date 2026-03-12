@@ -10,16 +10,19 @@
     <span th:text="#{block.list.title}">Bloqueos de Mantenimiento</span>
     <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
   </h2>
+  <!--TODO cambiar por success mesage-->
+  <!--<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>-->
+  <!--TODO cambiar por error mesage-->
+  <!--<div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>-->
 
-  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
-  <div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>
+  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
 
-  <a th:href="@{/admin/blocks/new/{id}(id=${spaceId})}"
+  <a th:href="@{/blocks/new/{id}(id=${spaceId})}"
      class="btn btn-success mb-3"
      th:text="#{block.action.new}">
     Nuevo Bloqueo
   </a>
-  <a href="/admin/spaces/list" class="btn btn-secondary mb-3"
+  <a href="/spaces/list" class="btn btn-secondary mb-3"
      th:text="#{common.back}">Volver</a>
 
   <div class="table-responsive">
@@ -39,14 +42,17 @@
         <td th:text="${#temporals.format(block.endDate,   'dd/MM/yyyy HH:mm')}">01/01/2026 18:00</td>
         <td th:text="${block.reason}">Mantenimiento</td>
         <td>
-                    <span th:if="${block.status.name() == 'ACTIVE'}"
-                          class="badge bg-danger" th:text="#{block.status.active}">ACTIVO</span>
+    <span th:if="${block.status.name() == 'ACTIVE'}"
+          class="badge bg-danger"
+          th:text="${block.status}">ACTIVE</span>
+
           <span th:unless="${block.status.name() == 'ACTIVE'}"
-                class="badge bg-secondary" th:text="#{block.status.cancelled}">CANCELADO</span>
+                class="badge bg-secondary"
+                th:text="${block.status}">CANCELLED</span>
         </td>
         <td>
           <form th:if="${block.status.name() == 'ACTIVE'}"
-                th:action="@{/admin/blocks/cancel/{id}(id=${block.id})}"
+                th:action="@{/blocks/cancel/{id}(id=${block.id})}"
                 method="post" style="display:inline;">
             <button type="submit" class="btn btn-sm btn-warning"
                     th:text="#{block.action.cancel}">Cancelar</button>
