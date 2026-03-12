@@ -48,7 +48,15 @@
 
     <p th:text="#{reservation.list.description}">Listado de todas las reservas registradas en el sistema (activas y canceladas).</p>
 
-    <button type="button" id="updateButton" class="btn btn-secondary" th:text="#{button.update}">Actualizar</button>
+    <div class="mb-3">
+        <button type="button" id="updateButton" class="btn btn-secondary" th:text="#{button.update}">Actualizar</button>
+
+        <a sec:authorize="hasRole('ROLE_ADMIN')"
+           th:href="@{/reservations/export(spaceId=${param.spaceId}, status=${param.status}, startDate=${param.startDate}, endDate=${param.endDate})}"
+           class="btn btn-success ms-2"> Exportar a CSV
+        </a>
+    </div>
+
     <script th:inline="javascript">
         /*<![CDATA[*/
         $("#updateButton").click(function () {

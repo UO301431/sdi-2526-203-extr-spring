@@ -35,6 +35,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/script/**", "/", "/signup",
                                 "/login/**").permitAll()
+                        .requestMatchers("/reservations/export").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/reservations/cancel*").hasAuthority("ROLE_EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
