@@ -139,4 +139,14 @@ public class SpaceService {
 
         return occupiedSlots;
     }
+
+    //sobrecarga de metodo que devuelve la lista sin paginacion
+    public List<Space> getActiveSpaces(){
+        return spaceRepository.findByActiveTrue();
+    }
+
+    public Space getSpace(Long id) {
+        return spaceRepository.findById(id).isPresent()
+                ? spaceRepository.findById(id).get() : new Space();
+    }
 }

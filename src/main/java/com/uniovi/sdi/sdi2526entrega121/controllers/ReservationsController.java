@@ -2,6 +2,7 @@ package com.uniovi.sdi.sdi2526entrega121.controllers;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
+import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
