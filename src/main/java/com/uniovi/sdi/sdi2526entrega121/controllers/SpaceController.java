@@ -70,7 +70,7 @@ public class SpaceController {
     public String getAvailabilityInfo(Model model, @PathVariable Long id,
                                       @RequestParam LocalDateTime startDate,
                                       @RequestParam LocalDateTime endDate){
-        model.addAttribute("space", spaceService.getSpace(id));
+        model.addAttribute("occupiedSlots", spaceService.getAvailabilityForSpace(id, startDate, endDate));
         return "space/availabilityInfo";
     }
 }
