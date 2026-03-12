@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import java.util.List;
+
 public interface SpaceRepository extends CrudRepository<Space, Long> {
 
     Page<Space> findAll(Pageable pageable);
@@ -23,4 +25,8 @@ public interface SpaceRepository extends CrudRepository<Space, Long> {
             "and (lower(sp.type) like lower(?1)) " +
             "and (sp.capacity >= ?2)")
     Page<Space> findActiveSpacesByTypeAndCapacity(Pageable pageable, String searchType, Integer searchCapacity);
+
+    //sobrecarga del metodo pàra obtener la lista sin paginacion
+    @Query("SELECT sp from Space sp where sp.active = true")
+    List<Space> findActiveSpaces( );
 }

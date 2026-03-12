@@ -31,4 +31,8 @@ public class ReservationsService {
     public Page<Reservation> getFilteredReservations(Long spaceId, LocalDateTime startDate, LocalDateTime endDate, Pageable pageable) {
         return reservationRepository.findByFilters(spaceId, startDate, endDate, pageable);
     }
+
+    public void addReservation(Reservation reservation) {
+        reservationRepository.save(reservation);
+    }
 }

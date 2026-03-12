@@ -10,8 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -101,5 +100,25 @@ public class ReservationsController {
         model.addAttribute("reservations", reservations.getContent());
 
         return "reservation/admin-list :: tableReservation";
+    }
+
+    /**
+     * Get de la vista de añadir reserva
+     */
+    @GetMapping("/reservations/add")
+    public String getReservation(Model model){
+        model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
+        model.addAttribute("reservation", new Reservation());
+        return "reservation/add";
+    }
+
+    /**
+     * Post para añadir la reserva recibida como parametro
+     * @param reservation, reserva a añadir
+     */
+    @PostMapping("/reservations/add")
+    public String setReservation(@ModelAttribute Reservation reservation){
+        reservationsService.addReservation(reservation);
+        return "reservation/add";
     }
 }

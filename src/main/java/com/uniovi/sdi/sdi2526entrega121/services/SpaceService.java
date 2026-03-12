@@ -78,4 +78,9 @@ public class SpaceService {
 
         return occupiedSlots;
     }
+
+    //sobrecarga de metodo que devuelve la lista sin paginacion
+    public List<Space> getActiveSpaces(){
+        return spaceRepository.findActiveSpaces();
+    }
 }
