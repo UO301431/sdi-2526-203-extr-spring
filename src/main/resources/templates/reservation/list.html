@@ -8,7 +8,7 @@
 <div class="container" id="main-container">
     <h2>Listado Global de Reservas</h2>
 
-    <form class="form-inline" action="/admin/reservations/list" method="GET">
+    <form class="form-inline" action="/reservations/list" method="GET">
         <div class="form-group">
             <label for="spaceId">Espacio:</label>
             <select name="spaceId" id="spaceId" class="form-control">
@@ -17,6 +17,18 @@
                         th:value="${space.id}"
                         th:text="${space.name}"
                         th:selected="${param.spaceId != null and param.spaceId[0] == space.id.toString()}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Estado:</label>
+            <select name="status" id="status" class="form-control">
+                <option value="">Todos</option>
+                <option th:each="stat : ${statuses}"
+                        th:value="${stat.name()}"
+                        th:text="${stat.name()}"
+                        th:selected="${param.status != null and param.status[0] == stat.name()}">
                 </option>
             </select>
         </div>
@@ -41,14 +53,16 @@
         /*<![CDATA[*/
         $("#updateButton").click(function () {
             let page = /*[[${param.page != null and !#lists.isEmpty(param.page) ? param.page[0] : null}]]*/ null;
-            let spaceId = /*[[${param.spaceId != null and !#lists.isEmpty(param.spaceId) ? param.spaceId[0] : ''}]]*/ '';
-            let startDate = /*[[${param.startDate != null and !#lists.isEmpty(param.startDate) ? param.startDate[0] : ''}]]*/ '';
-            let endDate = /*[[${param.endDate != null and !#lists.isEmpty(param.endDate) ? param.endDate[0] : ''}]]*/ '';
+            let spaceId = $("#spaceId").val() || /*[[${param.spaceId != null and !#lists.isEmpty(param.spaceId) ? param.spaceId[0] : ''}]]*/ '';
+            let status = $("#status").val() || /*[[${param.status != null and !#lists.isEmpty(param.status) ? param.status[0] : ''}]]*/ '';
+            let startDate = $("#startDate").val() || /*[[${param.startDate != null and !#lists.isEmpty(param.startDate) ? param.startDate[0] : ''}]]*/ '';
+            let endDate = $("#endDate").val() || /*[[${param.endDate != null and !#lists.isEmpty(param.endDate) ? param.endDate[0] : ''}]]*/ '';
 
-            // Adaptado para coincidir con la convención de tu controlador
-            let urlUpdate = '/admin/reservations/update?';
+            let urlUpdate = '/reservations/update?';
+
             if (page != null) urlUpdate += "page=" + page + "&";
             if (spaceId !== '') urlUpdate += "spaceId=" + spaceId + "&";
+            if (status !== '') urlUpdate += "status=" + status + "&";
             if (startDate !== '') urlUpdate += "startDate=" + startDate + "&";
             if (endDate !== '') urlUpdate += "endDate=" + endDate;
 
@@ -67,6 +81,7 @@
                     <th>Inicio</th>
                     <th>Fin</th>
                     <th>Estado</th>
+                    <th sec:authorize="hasRole('ROLE_EMPLOYEE')">Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -76,6 +91,16 @@
                     <td th:text="${#temporals.format(res.startDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
                     <td th:text="${#temporals.format(res.endDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</td>
                     <td th:text="${res.status}">ACTIVA</td>
+                    <td sec:authorize="hasRole('ROLE_EMPLOYEE')">
+                        <a th:if="${res.status.name() == 'ACTIVE'}"
+                           th:href="@{'/reservations/cancel/' + ${res.id}}"
+                           class="btn btn-danger btn-sm">Cancelar</a>
+
+                        <a th:unless="${res.status.name() == 'ACTIVE'}"
+                           href="#"
+                           class="btn btn-secondary btn-sm disabled"
+                           aria-disabled="true">Cancelada</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>

@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -32,67 +33,53 @@ public class ReservationsController {
     }
 
     @RequestMapping(value = "/reservations/list")
-    public String getOwnReservations(Model model,
-                                     Pageable pageable,
-                                     Principal principal,
-                                     @RequestParam(value = "status", required = false) ReservationStatus status) {
-
-        // String dni = principal.getName();
-        String dni = "10000001S";
-
-        Page<Reservation> reservations;
-
-        if (status != null) {
-            reservations = reservationsService.getReservationsByUserAndStatus(dni, status, pageable);
-        } else {
-            reservations = reservationsService.getReservationsByUser(dni, pageable);
-        }
-
-        model.addAttribute("reservationList", reservations.getContent());
-        model.addAttribute("page", reservations);
-        model.addAttribute("statuses", ReservationStatus.values());
-
-        return "reservation/user-list";
-    }
-
-    @RequestMapping(value = "/admin/reservations/list")
-    public String getAllReservations(Model model, Pageable pageable,
+    public String getReservations(Model model, Pageable pageable, Principal principal,
                                      @RequestParam(value = "spaceId", required = false) Long spaceId,
+                                     @RequestParam(value = "status", required = false) ReservationStatus status,
                                      @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
                                      @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        Page<Reservation> reservations = getAdminReservationsPage(spaceId, startDate, endDate, pageable);
+        String dni = principal.getName();
+
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
+
+        Page<Reservation> reservations = reservationsService.getFilteredReservations(dni, status, spaceId, start, end, pageable);
 
         model.addAttribute("reservations", reservations.getContent());
         model.addAttribute("page", reservations);
         model.addAttribute("spaces", spaceService.getSpaces(pageable));
+        model.addAttribute("statuses", ReservationStatus.values());
 
-        return "reservation/admin-list";
+        return "reservation/list";
     }
 
-    @RequestMapping(value = "/admin/reservations/update")
-    public String updateAllReservations(Model model,
-                                        Pageable pageable,
-                                        @RequestParam(value = "spaceId", required = false) Long spaceId,
-                                        @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                        @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+    @RequestMapping(value = "/reservations/update")
+    public String updateReservations(Model model, Pageable pageable, Principal principal,
+                                     @RequestParam(value = "spaceId", required = false) Long spaceId,
+                                     @RequestParam(value = "status", required = false) ReservationStatus status,
+                                     @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                     @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
-        Page<Reservation> reservations = getAdminReservationsPage(spaceId, startDate, endDate, pageable);
+        String dni = principal.getName();
 
-        model.addAttribute("reservations", reservations.getContent());
-        model.addAttribute("page", reservations); // Añadido para que el paginador también se actualice con AJAX
-
-        return "reservation/admin-list :: tableReservation";
-    }
-
-    private Page<Reservation> getAdminReservationsPage(Long spaceId, LocalDate startDate, LocalDate endDate, Pageable pageable) {
         LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
         LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
 
-        if (spaceId == null && start == null && end == null) {
-            return reservationsService.getReservations(pageable);
-        } else {
-            return reservationsService.getFilteredReservations(spaceId, start, end, pageable);
-        }
+        Page<Reservation> reservations = reservationsService.getFilteredReservations(dni, status, spaceId, start, end, pageable);
+
+        model.addAttribute("reservations", reservations.getContent());
+        model.addAttribute("page", reservations);
+
+        return "reservation/list :: tableReservation";
+    }
+
+    @RequestMapping(value = "/reservations/cancel/{id}")
+    public String cancelReservation(@PathVariable Long id, Principal principal) {
+        String dni = principal.getName();
+
+        reservationsService.cancelReservation(id, dni);
+
+        return "redirect:/reservations/list";
     }
 }
