@@ -7,6 +7,8 @@ import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
 import com.uniovi.sdi.sdi2526entrega121.validators.SignUpFormValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -51,6 +53,7 @@ public class UsersController {
 
     @RequestMapping("/home")
     public String home(Model model, Pageable pageable, Principal principal) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return "/home";
     }
 
