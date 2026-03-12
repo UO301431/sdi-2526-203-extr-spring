@@ -33,7 +33,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers("/css/**", "/images/**", "/script/**", "/", "/signup",
+                                "/login/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
