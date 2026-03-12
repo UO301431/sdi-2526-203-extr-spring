@@ -11,29 +11,31 @@
                 <a class="nav-link" href="/home"><span>Inicio</span></a>
             </li>
 
-            <li class="nav-item" sec:authorize="hasRole('ESTANDAR')">
+            <li class="nav-item" sec:authorize="hasRole('ROLE_EMPLOYEE')">
                 <a class="nav-link" href="/spaces/list">Espacios Disponibles</a>
             </li>
-            <li class="nav-item" sec:authorize="hasRole('ESTANDAR')">
-                <a class="nav-link" href="/reservations/my-reservations">Mis Reservas</a>
+            <li class="nav-item" sec:authorize="hasRole('ROLE_EMPLOYEE')">
+                <a class="nav-link" href="/reservations/list">Mis Reservas</a>
             </li>
 
-            <li class="nav-item dropdown" sec:authorize="hasRole('ADMIN')">
+            <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
                 <a class="nav-link dropdown-toggle" href="#" id="adminSpaces" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false"> Gestión de Espacios
+                   aria-haspopup="true" aria-expanded="false">Gestión de Espacios
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="/admin/spaces/list">Ver Espacios</a>
-                    <a class="dropdown-item" href="/admin/spaces/new">Registrar Espacio</a>
+                    <a class="dropdown-item" href="/spaces/list">Ver Espacios</a>
+                    <a class="dropdown-item" href="/spaces/new">Registrar Espacio</a>
                 </div>
             </li>
-            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                <a class="nav-link" href="/admin/reservations">Listado Global de Reservas</a>
+            <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
+                <a class="nav-link" href="/admin/reservations/list">Listado Global de Reservas</a>
             </li>
 
             <li class="nav-item" sec:authorize="isAuthenticated()">
                 <a class="nav-link" href="/profile/password">Cambiar Contraseña</a>
             </li>
+
+
         </ul>
 
         <ul class="navbar-nav justify-content-end">

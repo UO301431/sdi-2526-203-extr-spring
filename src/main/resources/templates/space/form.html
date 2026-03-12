@@ -10,7 +10,7 @@
 
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <form th:action="@{/admin/spaces/new}" th:object="${space}" method="post">
+    <form th:action="@{/spaces/new}" th:object="${space}" method="post">
 
         <div class="form-group mb-3">
             <label for="name" th:text="#{space.field.name}">Nombre</label>
@@ -50,7 +50,7 @@
         <button type="submit" class="btn btn-success" th:text="#{space.form.submit.new}">
             Crear Espacio
         </button>
-        <a href="/admin/spaces/list" class="btn btn-secondary" th:text="#{common.cancel}">
+        <a href="/spaces/list" class="btn btn-secondary" th:text="#{common.cancel}">
             Cancelar
         </a>
     </form>

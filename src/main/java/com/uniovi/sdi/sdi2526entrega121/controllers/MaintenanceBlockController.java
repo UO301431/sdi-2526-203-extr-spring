@@ -8,6 +8,8 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Controller
+@RequestMapping("/blocks")
 public class MaintenanceBlockController {
 
     @Autowired
@@ -28,10 +31,19 @@ public class MaintenanceBlockController {
     @Autowired
     private MessageSource messageSource;
 
-    // ── List blocks for a space ───────────────────────────────────────────────
+    // ── Helper: comprueba si el usuario autenticado es admin ──────────────────
 
-    @GetMapping("/admin/blocks/list/{spaceId}")
+    private boolean isAdmin() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    // ── Listado de bloqueos de un espacio ─────────────────────────────────────
+
+    @GetMapping("/list/{spaceId}")
     public String listBlocks(@PathVariable Long spaceId, Model model, Pageable pageable) {
+        if (!isAdmin()) return "redirect:/spaces/list";
         Page<MaintenanceBlock> blocks = blockService.getBlocksBySpace(spaceId, pageable);
         model.addAttribute("blocks", blocks.getContent());
         model.addAttribute("page", blocks);
@@ -40,16 +52,17 @@ public class MaintenanceBlockController {
         return "maintenance/list";
     }
 
-    // ── New block form ────────────────────────────────────────────────────────
+    // ── Formulario nuevo bloqueo ──────────────────────────────────────────────
 
-    @GetMapping("/admin/blocks/new/{spaceId}")
+    @GetMapping("/new/{spaceId}")
     public String newBlockForm(@PathVariable Long spaceId, Model model) {
+        if (!isAdmin()) return "redirect:/spaces/list";
         model.addAttribute("spaceId", spaceId);
         spaceService.findById(spaceId).ifPresent(s -> model.addAttribute("space", s));
         return "maintenance/form";
     }
 
-    @PostMapping("/admin/blocks/new/{spaceId}")
+    @PostMapping("/new/{spaceId}")
     public String createBlock(
             @PathVariable Long spaceId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm") LocalDateTime startDate,
@@ -58,6 +71,8 @@ public class MaintenanceBlockController {
             Model model,
             RedirectAttributes redirectAttrs,
             Locale locale) {
+
+        if (!isAdmin()) return "redirect:/spaces/list";
 
         String error = blockService.createBlock(spaceId, startDate, endDate, reason);
         if (error != null) {
@@ -71,16 +86,17 @@ public class MaintenanceBlockController {
         }
         redirectAttrs.addFlashAttribute("successMessage",
                 messageSource.getMessage("block.success.created", null, locale));
-        return "redirect:/admin/blocks/list/" + spaceId;
+        return "redirect:/blocks/list/" + spaceId;
     }
 
-    // ── Cancel block ──────────────────────────────────────────────────────────
+    // ── Cancelar bloqueo ──────────────────────────────────────────────────────
 
-    @PostMapping("/admin/blocks/cancel/{blockId}")
+    @PostMapping("/cancel/{blockId}")
     public String cancelBlock(@PathVariable Long blockId,
                               RedirectAttributes redirectAttrs,
                               Locale locale) {
-        // Retrieve spaceId before cancelling so we can redirect back
+        if (!isAdmin()) return "redirect:/spaces/list";
+
         Long spaceId = blockService.findById(blockId)
                 .map(b -> b.getSpace().getId())
                 .orElse(null);
@@ -95,8 +111,10 @@ public class MaintenanceBlockController {
         }
 
         if (spaceId != null) {
-            return "redirect:/admin/blocks/list/" + spaceId;
+            return "redirect:/blocks/list/" + spaceId;
         }
-        return "redirect:/admin/spaces/list";
+        return "redirect:/spaces/list";
     }
+
+
 }

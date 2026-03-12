@@ -10,7 +10,8 @@
 
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-    <form th:action="@{/admin/spaces/edit/{id}(id=${space.id})}" method="post">
+    <form th:action="@{/spaces/edit/{id}(id=${space.id})}" method="post">
+    <form th:action="@{/spaces/edit/{id}(id=${space.id})}" method="post">
 
         <div class="form-group mb-3">
             <label for="name" th:text="#{space.field.name}">Nombre</label>
@@ -50,7 +51,7 @@
         <button type="submit" class="btn btn-primary" th:text="#{space.form.submit.edit}">
             Guardar Cambios
         </button>
-        <a href="/admin/spaces/list" class="btn btn-secondary" th:text="#{common.cancel}">
+        <a href="/spaces/list" class="btn btn-secondary" th:text="#{common.cancel}">
             Cancelar
         </a>
     </form>
