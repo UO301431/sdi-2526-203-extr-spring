@@ -61,4 +61,11 @@ class Sdi2526Entrega121ApplicationTests {
     void PR28(){
         //TODO
     }
+
+    //Se consulta la disponibilidad de un espacio
+    @Test
+    @Order(29)
+    void PR29(){
+        //TODO
+    }
 }

@@ -1,9 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
-import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
-import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
-import com.uniovi.sdi.sdi2526entrega121.entities.Space;
-import com.uniovi.sdi.sdi2526entrega121.entities.User;
+import com.uniovi.sdi.sdi2526entrega121.entities.*;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import jakarta.annotation.PostConstruct;
@@ -63,11 +60,13 @@ public class InsertSampleDataService {
         Space space2 = new Space("Laboratorio Alan Turing", "Laboratorio", "Planta 2 - Edificio B", 25);
         Space space3 = new Space("Auditorio Grace Hopper", "Auditorio", "Planta Baja", 150);
         Space space4 = new Space("Despacho 404", "Despacho", "Planta 4 - Edificio A", 4);
+        Space space5 = new Space("Sala Linus Torvalds", "Sala de Reuniones", "Planta 3 - Edificio B", 8);
 
         spaceRepository.save(space1);
         spaceRepository.save(space2);
         spaceRepository.save(space3);
         spaceRepository.save(space4);
+        spaceRepository.save(space5);
 
         // ==========================================
         // 3. CREAR RESERVAS
@@ -125,6 +124,18 @@ public class InsertSampleDataService {
                 LocalDateTime.now().plusDays(10).withHour(20).withMinute(0),
                 "Presentación de proyectos finales");
 
+        // Reserva 9: Futura 2027, Activa (Usuario 1)
+        Reservation res_space5_1 = new Reservation(users.get(1), space5,
+                LocalDateTime.of(2027, 3, 15, 9, 0),
+                LocalDateTime.of(2027, 3, 15, 11, 0),
+                "Reunión de seguimiento de proyecto");
+
+        // Reserva 10: Futura 2027, Activa (Usuario 2)
+        Reservation res_space5_2 = new Reservation(users.get(2), space5,
+                LocalDateTime.of(2027, 3, 15, 12, 0),
+                LocalDateTime.of(2027, 3, 15, 14, 0),
+                "Revisión de código");
+
         // Guardar todas las reservas
         reservationRepository.save(res1);
         reservationRepository.save(res2);
@@ -134,5 +145,24 @@ public class InsertSampleDataService {
         reservationRepository.save(res6);
         reservationRepository.save(res7);
         reservationRepository.save(res8);
+        reservationRepository.save(res_space5_1);
+        reservationRepository.save(res_space5_2);
+
+        // ==========================================
+        // 3. CREAR BLOQUEOS
+        // ==========================================
+        // Bloqueo 1: Mantenimiento programado
+        Block block_space5_1 = new Block(space5,
+                LocalDateTime.of(2027, 4, 10, 8, 0),
+                LocalDateTime.of(2027, 4, 10, 18, 0),
+                "Mantenimiento de instalaciones",
+                BlockStatus.ACTIVE);
+
+        // Bloqueo 2: Evento especial
+        Block block_space5_2 = new Block(space5,
+                LocalDateTime.of(2027, 5, 20, 9, 0),
+                LocalDateTime.of(2027, 5, 20, 17, 0),
+                "Reservado para evento corporativo",
+                BlockStatus.ACTIVE);
     }
 }

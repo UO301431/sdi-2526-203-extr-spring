@@ -41,6 +41,14 @@ public class Block {
         this.reason = reason;
     }
 
+    public Block(Space space, LocalDateTime startDate, LocalDateTime endDate, String reason, BlockStatus status) {
+        this.space = space;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.reason = reason;
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }
