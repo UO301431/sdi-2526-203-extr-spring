@@ -4,10 +4,12 @@ import com.uniovi.sdi.sdi2526entrega121.entities.Space;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
@@ -66,10 +68,10 @@ public class SpaceController {
         return "space/availability";
     }
 
-    @GetMapping("/space/availability/info/{id}")
-    public String getAvailabilityInfo(Model model, @PathVariable Long id,
-                                      @RequestParam LocalDateTime startDate,
-                                      @RequestParam LocalDateTime endDate){
+    @GetMapping("/space/availability/info")
+    public String getAvailabilityInfo(Model model, @RequestParam Long id,
+                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                      @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate){
         model.addAttribute("occupiedSlots", spaceService.getAvailabilityForSpace(id, startDate, endDate));
         model.addAttribute("spaceName", spaceService.getSpace(id).getName());
         return "space/availabilityInfo";

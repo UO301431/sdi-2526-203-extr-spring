@@ -7,8 +7,12 @@
 
 <div class="container" id="main-container">
     <h2 th:text="${'Consultar disponibilidad de ' + space.name}"></h2>
-    <form class="form-inline" action="/space/availability/info/{id}">
+    <form class="form-inline" action="/space/availability/info">
         <div class="form-group">
+            <label>
+                <input type="number" th:value="${space.id}" hidden="hidden" name="id">
+            </label>
+
             <label for="startDate">Fecha inicio</label>
             <input type="datetime-local" id="startDate" name="startDate" class="form-control" required >
 
