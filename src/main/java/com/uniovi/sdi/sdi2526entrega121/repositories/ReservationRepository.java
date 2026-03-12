@@ -43,11 +43,11 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                      @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT r FROM Reservation r WHERE " +
-            "(r.user.id = :userId) AND " +
+            "r.user.id = :userId AND " +
             "(:status IS NULL OR r.status = :status) AND " +
-            "(cast(:spaceId as long) IS NULL OR r.space.id = :spaceId) AND " +
-            "(cast(:startDate as timestamp) IS NULL OR r.startDate >= :startDate) AND " +
-            "(cast(:endDate as timestamp) IS NULL OR r.endDate <= :endDate)")
+            "(:spaceId IS NULL OR r.space.id = :spaceId) AND " +
+            "(:startDate IS NULL OR r.startDate >= :startDate) AND " +
+            "(:endDate IS NULL OR r.endDate <= :endDate)")
     Page<Reservation> findByUserAndFilters(@Param("userId") Long userId,
                                            @Param("status") ReservationStatus status,
                                            @Param("spaceId") Long spaceId,
