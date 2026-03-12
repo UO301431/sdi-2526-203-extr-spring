@@ -2,8 +2,10 @@ package com.uniovi.sdi.sdi2526entrega121.controllers;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
+import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
+import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,8 +28,11 @@ public class ReservationsController {
     @Autowired
     private SpaceService spaceService;
 
-    public ReservationsController() {
+    private final UsersService usersService;
 
+    public ReservationsController(UsersService usersService) {
+
+        this.usersService = usersService;
     }
 
     @RequestMapping(value = "/reservations/list")
@@ -117,7 +122,11 @@ public class ReservationsController {
      * @param reservation, reserva a añadir
      */
     @PostMapping("/reservations/add")
-    public String setReservation(@ModelAttribute Reservation reservation){
+    public String setReservation(@ModelAttribute Reservation reservation,
+                                 Principal principal){
+        String dni = principal.getName();
+        User user = usersService.getUserByDni(dni);
+        reservation.setUser(user);
         reservationsService.addReservation(reservation);
         return "reservation/add";
     }
