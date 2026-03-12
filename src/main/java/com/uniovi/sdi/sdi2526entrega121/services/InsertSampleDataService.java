@@ -1,6 +1,7 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.*;
+import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import jakarta.annotation.PostConstruct;
@@ -15,13 +16,15 @@ public class InsertSampleDataService {
     private final UsersService usersService;
     private final SpaceRepository spaceRepository;
     private final ReservationRepository reservationRepository;
+    private final BlockRepository blockRepository;
 
     public InsertSampleDataService(UsersService usersService,
                                    SpaceRepository spaceRepository,
-                                   ReservationRepository reservationRepository) {
+                                   ReservationRepository reservationRepository, BlockRepository blockRepository) {
         this.usersService = usersService;
         this.spaceRepository = spaceRepository;
         this.reservationRepository = reservationRepository;
+        this.blockRepository = blockRepository;
     }
 
     @PostConstruct
@@ -132,8 +135,8 @@ public class InsertSampleDataService {
 
         // Reserva 10: Futura 2027, Activa (Usuario 2)
         Reservation res_space5_2 = new Reservation(users.get(2), space5,
-                LocalDateTime.of(2027, 3, 15, 12, 0),
-                LocalDateTime.of(2027, 3, 15, 14, 0),
+                LocalDateTime.of(2027, 5, 15, 12, 0),
+                LocalDateTime.of(2027, 5, 15, 14, 0),
                 "Revisión de código");
 
         // Guardar todas las reservas
@@ -160,9 +163,13 @@ public class InsertSampleDataService {
 
         // Bloqueo 2: Evento especial
         Block block_space5_2 = new Block(space5,
-                LocalDateTime.of(2027, 5, 20, 9, 0),
-                LocalDateTime.of(2027, 5, 20, 17, 0),
+                LocalDateTime.of(2027, 7, 20, 9, 0),
+                LocalDateTime.of(2027, 7, 20, 17, 0),
                 "Reservado para evento corporativo",
                 BlockStatus.ACTIVE);
+
+        // Guardar todas los bloqueos
+        blockRepository.save(block_space5_1);
+        blockRepository.save(block_space5_2);
     }
 }

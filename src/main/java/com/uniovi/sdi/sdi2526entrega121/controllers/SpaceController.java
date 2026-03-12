@@ -22,6 +22,11 @@ public class SpaceController {
         this.spaceService = spaceService;
     }
 
+    /**
+     * Muestra la lista de espacios disponibles
+     * @param searchType, cadena de texto para filtar por tipo
+     * @param searchCapacity, número para filtar por capacidad minima
+     */
     @GetMapping("spaces")
     public String getList(Model model, Pageable pageable,
                           @RequestParam(value = "", required = false) String searchType,
@@ -53,6 +58,10 @@ public class SpaceController {
         return "space/list";
     }
 
+    /**
+     * Se devuelven los detalles del espacio solicitado
+     * @param id, id del espacio del que se consultan los detalles
+     */
     @GetMapping("space/details/{id}")
     public String getDetail(Model model, @PathVariable Long id){
         model.addAttribute("space", spaceService.getSpace(id));
@@ -68,6 +77,13 @@ public class SpaceController {
         return "space/availability";
     }
 
+    /**
+     * Se devuelven los dias en los que el esapcio no esta disponible, indicandp
+     * si es por reserva o bloqueo, fechas en las que no esta disponible y motivo
+     * @param id, id del espacio del que se consulta la disponibilidad
+     * @param startDate, primera fecha del rango a consultar
+     * @param endDate, fecha final del rango a consultar
+     */
     @GetMapping("/space/availability/info")
     public String getAvailabilityInfo(Model model, @RequestParam Long id,
                                       @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
