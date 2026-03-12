@@ -36,7 +36,14 @@ public class SecurityConfiguration {
                         .anyRequest().permitAll()
                 )
                 .csrf(csrf -> csrf.disable())
-                .formLogin(form -> form.disable());
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .permitAll())
+                .logout((logout) -> logout
+                    .logoutUrl("/logout").permitAll())
+                .securityContext(securityContext -> securityContext
+                        .requireExplicitSave(true));
 
         return http.build();
     }
