@@ -71,6 +71,7 @@ public class SpaceController {
                                       @RequestParam LocalDateTime startDate,
                                       @RequestParam LocalDateTime endDate){
         model.addAttribute("occupiedSlots", spaceService.getAvailabilityForSpace(id, startDate, endDate));
+        model.addAttribute("spaceName", spaceService.getSpace(id).getName());
         return "space/availabilityInfo";
     }
 }

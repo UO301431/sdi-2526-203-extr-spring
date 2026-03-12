@@ -55,6 +55,10 @@ public class SpaceService {
                 ? spaceRepository.findById(id).get() : new Space();
     }
 
+    //Obtiene las fechas ocupadas para un espacio para un rango de fechas
+    //tambien funciona como logiva para eviatr solapamientos (REQUISITO 14)
+    //      si la lista que devuelve esta vacia no hay solapamientos
+    //      si existe al menos un slot ocupado existe solapamiento
     public List<OccupiedSlot> getAvailabilityForSpace(Long spaceId, LocalDateTime startDate,
                                                       LocalDateTime endDate){
         List<OccupiedSlot> occupiedSlots = new ArrayList<>();
