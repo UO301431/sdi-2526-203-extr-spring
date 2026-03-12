@@ -168,8 +168,16 @@ public class InsertSampleDataService {
                 "Reservado para evento corporativo",
                 BlockStatus.ACTIVE);
 
+        // Bloqueo 3: Fuera del rango
+        Block block_space5_3 = new Block(space5,
+                LocalDateTime.of(2028, 7, 20, 9, 0),
+                LocalDateTime.of(2028, 7, 20, 17, 0),
+                "Reservado para evento educativo",
+                BlockStatus.ACTIVE);
+
         // Guardar todas los bloqueos
         blockRepository.save(block_space5_1);
         blockRepository.save(block_space5_2);
+        blockRepository.save(block_space5_3);
     }
 }
