@@ -1,5 +1,8 @@
 package com.uniovi.sdi.sdi2526entrega121;
 
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_LoginView;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_PrivateView;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_View;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -58,6 +61,15 @@ class Sdi2526Entrega121ApplicationTests {
 
     private String bodyText() {
         return driver.findElement(By.tagName("body")).getText();
+    }
+
+    private void comprobarPaginacion() {
+        // Busca el enlace a la página 2 y hace clic si existe
+        List<WebElement> page2 = driver.findElements(By.xpath("//a[contains(@href, 'page=2')]"));
+        if (!page2.isEmpty()) {
+            page2.get(0).click();
+            assertTrue(driver.getCurrentUrl().contains("page="), "La URL debe mantener la paginación");
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -447,6 +459,88 @@ class Sdi2526Entrega121ApplicationTests {
     }
 
     @Test
+    @Order(23)
+    void PR23(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        PO_View.checkElementBy(driver, "text", "Estado");
+        PO_View.checkElementBy(driver, "text", "Usuario");
+        PO_View.checkElementBy(driver, "text", "Inicio");
+        PO_View.checkElementBy(driver, "text", "Espacio");
+        PO_View.checkElementBy(driver, "text", "Fin");
+
+        PO_PrivateView.checkPagination(driver);
+
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
+        int numeroDeFilas = filas.size();
+        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
+        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+    }
+
+    @Test
+    @Order(24)
+    void PR24(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
+
+        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
+
+        assertTrue(driver.getCurrentUrl().contains("spaceId="), "La URL debe contener el filtro por espacio");
+
+        PO_PrivateView.checkPagination(driver);
+
+        assertTrue(driver.getCurrentUrl().contains("spaceId="), "El filtro de espacio debe mantenerse al cambiar de página");
+
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
+        int numeroDeFilas = filas.size();
+        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
+        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+    }
+
+    @Test
+    @Order(25)
+    void PR25(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        driver.findElement(By.id("startDate")).sendKeys("2026-03-14");
+        driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
+
+        PO_PrivateView.findAndClick(driver, "free",
+                "//form[@action='/reservations/list']//button[@type='submit']", 0);
+
+        try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
+
+        assertTrue(driver.getCurrentUrl().contains("startDate="), "La URL debe contener la fecha de inicio");
+        assertTrue(driver.getCurrentUrl().contains("endDate="), "La URL debe contener la fecha de fin");
+
+        PO_PrivateView.checkPagination(driver);
+
+        assertTrue(driver.getCurrentUrl().contains("startDate="), "El filtro de fecha debe mantenerse al cambiar de página");
+    }
+
+    @Test
     @Order(26)
         //Consultar el listado de espacios disponibles
     void PR26(){
@@ -501,5 +595,56 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(33)
     void PR33(){
         //TODO
+    }
+
+    @Test
+    @Order(34)
+    void PR34(){
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+
+        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
+        elements.get(0).click();
+
+        PO_View.checkElementBy(driver, "text", "Listado Global de Reservas");
+
+        PO_View.checkElementBy(driver, "text", "Espacio");
+        PO_View.checkElementBy(driver, "text", "Inicio");
+        PO_View.checkElementBy(driver, "text", "Fin");
+        PO_View.checkElementBy(driver, "text", "Estado");
+
+        List<WebElement> rows = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        assertEquals(4, rows.size(), "El listado debería mostrar 4 reservas para este usuario");
+
+        PO_LoginView.logout(driver);
+    }
+
+    @Test
+    @Order(35)
+    void PR35(){
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+
+        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
+        elements.get(0).click();
+
+        WebElement statusSelect = driver.findElement(By.id("status"));
+        statusSelect.click();
+
+        WebElement cancelledOption = driver.findElement(By.xpath("//*[@id=\"status\"]/option[3]"));
+        cancelledOption.click();
+
+        WebElement searchButton = driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button"));
+        searchButton.click();
+
+        List<WebElement> statusCells = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+
+        assertEquals(1, statusCells.size(), "Debería haber al menos una reserva cancelada");
+
+        for (WebElement cell : statusCells) {
+            String cellText = cell.getText().toUpperCase();
+            Assertions.assertTrue(cellText.contains("CANCELADA") || cellText.contains("CANCELLED"),
+                    "El estado de la reserva listada debería ser CANCELADA, pero fue: " + cellText);
+        }
+
+        PO_LoginView.logout(driver);
     }
 }
