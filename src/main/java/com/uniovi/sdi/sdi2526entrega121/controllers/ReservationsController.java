@@ -26,6 +26,10 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Controlador encargado de gestionar las peticiones web relacionadas con las reservas.
+ * Permite listar, filtrar, añadir, cancelar y exportar reservas a CSV.
+ */
 @Controller
 public class ReservationsController {
 
@@ -37,11 +41,27 @@ public class ReservationsController {
 
     private final UsersService usersService;
 
+    /**
+     * Constructor del controlador que inyecta el servicio de usuarios.
+     *
+     * @param usersService Servicio para la gestión de usuarios.
+     */
     public ReservationsController(UsersService usersService) {
-
         this.usersService = usersService;
     }
 
+    /**
+     * Obtiene y muestra la lista de reservas paginada y filtrada.
+     *
+     * @param model     Modelo de Spring para pasar datos a la vista.
+     * @param pageable  Objeto que contiene la información de paginación.
+     * @param principal Objeto que representa al usuario autenticado actual.
+     * @param spaceId   (Opcional) ID del espacio para filtrar.
+     * @param status    (Opcional) Estado de la reserva para filtrar.
+     * @param startDate (Opcional) Fecha de inicio para filtrar.
+     * @param endDate   (Opcional) Fecha de fin para filtrar.
+     * @return El nombre de la vista de listado de reservas ("reservation/list").
+     */
     @RequestMapping(value = "/reservations/list")
     public String getReservations(Model model, Pageable pageable, Principal principal,
                                   @RequestParam(value = "spaceId", required = false) Long spaceId,
@@ -64,6 +84,19 @@ public class ReservationsController {
         return "reservation/list";
     }
 
+    /**
+     * Actualiza asíncronamente (AJAX) la tabla de reservas aplicando los filtros y la paginación.
+     * Devuelve únicamente el fragmento HTML correspondiente a la tabla.
+     *
+     * @param model     Modelo de Spring para pasar datos a la vista.
+     * @param pageable  Objeto que contiene la información de paginación.
+     * @param principal Objeto que representa al usuario autenticado actual.
+     * @param spaceId   (Opcional) ID del espacio para filtrar.
+     * @param status    (Opcional) Estado de la reserva para filtrar.
+     * @param startDate (Opcional) Fecha de inicio para filtrar.
+     * @param endDate   (Opcional) Fecha de fin para filtrar.
+     * @return El fragmento Thymeleaf de la tabla de reservas ("reservation/list :: tableReservation").
+     */
     @RequestMapping(value = "/reservations/update")
     public String updateReservations(Model model, Pageable pageable, Principal principal,
                                      @RequestParam(value = "spaceId", required = false) Long spaceId,
@@ -84,6 +117,13 @@ public class ReservationsController {
         return "reservation/list :: tableReservation";
     }
 
+    /**
+     * Cancela una reserva existente verificando que pertenece al usuario autenticado.
+     *
+     * @param id        ID de la reserva que se desea cancelar.
+     * @param principal Objeto que representa al usuario autenticado actual.
+     * @return Redirección a la vista del listado de reservas.
+     */
     @RequestMapping(value = "/reservations/cancel/{id}")
     public String cancelReservation(@PathVariable Long id, Principal principal) {
         String dni = principal.getName();
@@ -94,7 +134,11 @@ public class ReservationsController {
     }
 
     /**
-     * Get de la vista de añadir reserva
+     * Muestra la vista con el formulario para añadir una nueva reserva.
+     * Carga los espacios activos disponibles para reservar.
+     *
+     * @param model Modelo de Spring para pasar datos a la vista.
+     * @return El nombre de la vista de creación de reservas ("reservation/add").
      */
     @GetMapping("/reservations/add")
     public String getReservation(Model model){
@@ -104,8 +148,12 @@ public class ReservationsController {
     }
 
     /**
-     * Post para añadir la reserva recibida como parametro
-     * @param reservation, reserva a añadir
+     * Procesa el formulario para añadir una nueva reserva.
+     * Asocia la reserva al usuario autenticado y la guarda en el sistema.
+     *
+     * @param reservation Objeto reserva rellenado desde el formulario.
+     * @param principal   Objeto que representa al usuario autenticado actual.
+     * @return El nombre de la vista ("reservation/add").
      */
     @PostMapping("/reservations/add")
     public String setReservation(@ModelAttribute Reservation reservation,
@@ -116,14 +164,27 @@ public class ReservationsController {
         reservationsService.addReservation(reservation);
         return "reservation/add";
     }
+
+    /**
+     * Exporta el listado de reservas filtrado a un archivo CSV descargable.
+     * Se genera aplicando los mismos filtros que el listado visual pero sin paginación.
+     *
+     * @param response  Objeto HTTP Response usado para configurar la cabecera y escribir el archivo CSV.
+     * @param principal Objeto que representa al usuario autenticado actual.
+     * @param spaceId   (Opcional) ID del espacio para filtrar.
+     * @param status    (Opcional) Estado de la reserva para filtrar.
+     * @param startDate (Opcional) Fecha de inicio para filtrar.
+     * @param endDate   (Opcional) Fecha de fin para filtrar.
+     * @throws Exception Si ocurre un error al escribir la respuesta HTTP.
+     */
     @RequestMapping(value = "/reservations/export")
     public void exportReservationsToCSV(HttpServletResponse response, Principal principal,
                                         @RequestParam(required = false) Long spaceId,
                                         @RequestParam(required = false) ReservationStatus status,
                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                            LocalDate startDate,
+                                        LocalDate startDate,
                                         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                            LocalDate endDate) throws Exception {
+                                        LocalDate endDate) throws Exception {
 
         String userLoggedDni = principal.getName();
 
