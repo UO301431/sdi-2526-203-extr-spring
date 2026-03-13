@@ -4,6 +4,7 @@ import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.PrintWriter;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Controller
 public class ReservationsController {
@@ -81,5 +85,46 @@ public class ReservationsController {
         reservationsService.cancelReservation(id, dni);
 
         return "redirect:/reservations/list";
+    }
+
+    @RequestMapping(value = "/reservations/export")
+    public void exportReservationsToCSV(HttpServletResponse response, Principal principal,
+                                        @RequestParam(required = false) Long spaceId,
+                                        @RequestParam(required = false) ReservationStatus status,
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                            LocalDate startDate,
+                                        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                            LocalDate endDate) throws Exception {
+
+        String userLoggedDni = principal.getName();
+
+        LocalDateTime start = (startDate != null) ? startDate.atStartOfDay() : null;
+        LocalDateTime end = (endDate != null) ? endDate.atTime(LocalTime.MAX) : null;
+
+        List<Reservation> reservations = reservationsService.getFilteredReservations(userLoggedDni,
+                status, spaceId, start, end, Pageable.unpaged()).getContent();
+
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"reservas.csv\"");
+
+        PrintWriter writer = response.getWriter();
+        writer.write('\ufeff');
+
+        writer.println("Espacio;Nombre;DNI;Inicio;Fin;Estado");
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        for (Reservation reservation : reservations) {
+            writer.printf("%s;%s;%s;%s;%s;%s%n",
+                    reservation.getSpace().getName(),
+                    reservation.getUser().getName(),
+                    reservation.getUser().getDni(),
+                    reservation.getStartDate().format(formatter),
+                    reservation.getEndDate().format(formatter),
+                    reservation.getStatus());
+        }
+
+        writer.flush();
+        writer.close();
     }
 }
