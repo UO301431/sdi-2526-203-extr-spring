@@ -10,10 +10,12 @@
         <span th:text="#{block.form.title}">Nuevo Bloqueo de Mantenimiento</span>
         <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
     </h2>
+    <!-- TODO cambiar por error message-->
+    <!--<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>-->
 
-    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-    <form th:action="@{/admin/blocks/new/{id}(id=${spaceId})}" method="post">
+    <form th:action="@{/blocks/new/{id}(id=${spaceId})}" method="post">
 
         <div class="form-group mb-3">
             <label for="startDate" th:text="#{block.field.start}">Inicio</label>
@@ -37,7 +39,7 @@
 
         <button type="submit" class="btn btn-success"
                 th:text="#{block.form.submit}">Crear Bloqueo</button>
-        <a th:href="@{/admin/blocks/list/{id}(id=${spaceId})}"
+        <a th:href="@{/blocks/list/{id}(id=${spaceId})}"
            class="btn btn-secondary" th:text="#{common.cancel}">Cancelar</a>
     </form>
 </div>

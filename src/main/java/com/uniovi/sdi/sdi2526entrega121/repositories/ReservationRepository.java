@@ -43,17 +43,6 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                      @Param("startDate") LocalDateTime startDate,
                                      @Param("endDate") LocalDateTime endDate);
 
-    @Query("SELECT r FROM Reservation r " +
-            "WHERE r.space.id = :spaceId  " +
-            "AND r.status = 'ACTIVE'  " +
-            "AND r.startDate < :endDate  " +
-            "AND r.endDate > :startDate")
-    List<Reservation> findActiveReservationsInRange(
-            @Param("spaceId") Long spaceId,
-            @Param("startDate") LocalDateTime startDate,
-            @Param("endDate") LocalDateTime endDate
-    );
-
     @Query("SELECT r FROM Reservation r WHERE " +
             "r.user.id = :userId AND " +
             "(:status IS NULL OR r.status = :status) AND " +
@@ -66,4 +55,15 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                            @Param("startDate") LocalDateTime startDate,
                                            @Param("endDate") LocalDateTime endDate,
                                            Pageable pageable);
+
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE r.space.id = :spaceId  " +
+            "AND r.status = 'ACTIVE'  " +
+            "AND r.startDate < :endDate  " +
+            "AND r.endDate > :startDate")
+    List<Reservation> findActiveReservationsInRange(
+            @Param("spaceId") Long spaceId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }
