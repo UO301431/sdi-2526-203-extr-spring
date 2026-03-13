@@ -2,8 +2,10 @@ package com.uniovi.sdi.sdi2526entrega121.controllers;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
+import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
+import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.PrintWriter;
 import java.security.Principal;
@@ -32,16 +35,19 @@ public class ReservationsController {
     @Autowired
     private SpaceService spaceService;
 
-    public ReservationsController() {
+    private final UsersService usersService;
 
+    public ReservationsController(UsersService usersService) {
+
+        this.usersService = usersService;
     }
 
     @RequestMapping(value = "/reservations/list")
     public String getReservations(Model model, Pageable pageable, Principal principal,
-                                     @RequestParam(value = "spaceId", required = false) Long spaceId,
-                                     @RequestParam(value = "status", required = false) ReservationStatus status,
-                                     @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-                                     @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+                                  @RequestParam(value = "spaceId", required = false) Long spaceId,
+                                  @RequestParam(value = "status", required = false) ReservationStatus status,
+                                  @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                  @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
 
         String dni = principal.getName();
 
@@ -87,6 +93,29 @@ public class ReservationsController {
         return "redirect:/reservations/list";
     }
 
+    /**
+     * Get de la vista de añadir reserva
+     */
+    @GetMapping("/reservations/add")
+    public String getReservation(Model model){
+        model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
+        model.addAttribute("reservation", new Reservation());
+        return "reservation/add";
+    }
+
+    /**
+     * Post para añadir la reserva recibida como parametro
+     * @param reservation, reserva a añadir
+     */
+    @PostMapping("/reservations/add")
+    public String setReservation(@ModelAttribute Reservation reservation,
+                                 Principal principal){
+        String dni = principal.getName();
+        User user = usersService.getUserByDni(dni);
+        reservation.setUser(user);
+        reservationsService.addReservation(reservation);
+        return "reservation/add";
+    }
     @RequestMapping(value = "/reservations/export")
     public void exportReservationsToCSV(HttpServletResponse response, Principal principal,
                                         @RequestParam(required = false) Long spaceId,

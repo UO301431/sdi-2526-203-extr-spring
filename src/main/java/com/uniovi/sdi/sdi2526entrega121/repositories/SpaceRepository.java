@@ -34,4 +34,5 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
 
     // All active spaces as list (for dropdowns)
     List<Space> findByActiveTrue();
+
 }

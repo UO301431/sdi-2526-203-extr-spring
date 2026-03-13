@@ -47,4 +47,8 @@ public class ReservationsService {
             }
         }
     }
+
+    public void addReservation(Reservation reservation) {
+        reservationRepository.save(reservation);
+    }
 }

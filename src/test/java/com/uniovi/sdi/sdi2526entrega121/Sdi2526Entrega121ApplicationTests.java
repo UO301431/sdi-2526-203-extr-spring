@@ -445,4 +445,61 @@ class Sdi2526Entrega121ApplicationTests {
                 "El bloqueo cancelado debe mostrarse con estado CANCELADO"
         );
     }
+
+    @Test
+    @Order(26)
+        //Consultar el listado de espacios disponibles
+    void PR26(){
+        //TODO
+    }
+
+    //Se aplica el filtro de capacidad con el valor 10
+    @Test
+    @Order(27)
+    void PR27(){
+        //TODO
+    }
+
+    //Se accede a los detalles del primer espacio
+    @Test
+    @Order(28)
+    void PR28(){
+        //TODO
+    }
+
+    //Se consulta la disponibilidad de un espacio
+    @Test
+    @Order(29)
+    void PR29(){
+        //TODO
+    }
+
+    //Registrar una reserva valida
+    @Test
+    @Order(30)
+    void PR30(){
+        //TODO
+    }
+
+    //Registrar una reserva inválida (inicio posterior al fin)
+    @Test
+    @Order(31)
+    void PR31(){
+        //TODO
+    }
+
+    //Crear dos reservas solapadas en el mismo espacio (la primera es válida, pero la segunda
+    //debe fallar).
+    @Test
+    @Order(32)
+    void PR32(){
+        //TODO
+    }
+
+    //Intentar reservar dentro de un bloqueo (debe fallar).
+    @Test
+    @Order(33)
+    void PR33(){
+        //TODO
+    }
 }
