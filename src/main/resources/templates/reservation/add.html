@@ -1,36 +1,35 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head"> <title>Lista de Espacios</title> </head>
+<head th:replace="fragments/head"> <title th:text="#{reservation.pageTitle}">Lista de Espacios</title> </head>
 <body>
-<!-- Barra de Navegación superior -->
 <nav th:replace="fragments/nav"></nav>
 <div class="container" id="main-container">
-    <h2>Reservar</h2>
+    <h2 th:text="#{reservation.title}">Reservar</h2>
     <form class="form-horizontal" method="post" action="/reservations/add" th:object="${reservation}">
         <div class="form-group">
-            <label class="control-label col-sm-2" for="space">Espacio:</label>
+            <label class="control-label col-sm-2" for="space" th:text="#{reservation.space}">Espacio:</label>
             <div class="col-sm-10" th:if="${activeSpaces != null and not #lists.isEmpty(activeSpaces)}">
                 <select id="space" class="form-control" name="space">
                     <option th:each="space : ${activeSpaces}"
                             th:value="${space.id}"
-                            th:text="${space.name} + '- Capacidad: ' + ${space.capacity}">
+                            th:text="${space.name} + ' - ' + #{reservation.capacity} + ': ' + ${space.capacity}">
                         Espacio
                     </option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label class="control-label col-sm-2" for="startDate">Fecha inicio reserva:</label>
+                <label class="control-label col-sm-2" for="startDate" th:text="#{reservation.startDate}">Fecha inicio reserva:</label>
                 <div class="col-sm-10">
                     <input type="datetime-local" id="startDate" name="startDate" class="form-control" required >
                 </div>
 
-                <label class="control-label col-sm-2" for="endDate">Fecha fin reserva:</label>
+                <label class="control-label col-sm-2" for="endDate" th:text="#{reservation.endDate}">Fecha fin reserva:</label>
                 <div class="col-sm-10">
                     <input type="datetime-local" id="endDate" name="endDate" class="form-control" required >
                 </div>
 
-                <label class="control-label col-sm-2" for="reason">Motivo</label>
+                <label class="control-label col-sm-2" for="reason" th:text="#{reservation.reason}">Motivo</label>
                 <div class="col-sm-10">
                     <input type="text" id="reason" name="reason" class="form-control">
                 </div>
@@ -39,12 +38,11 @@
         </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary">Reservar</button>
+                <button type="submit" class="btn btn-primary" th:text="#{reservation.submit}">Reservar</button>
             </div>
         </div>
     </form>
 </div>
-
 
 <footer th:replace="fragments/footer"></footer>
 </body>
