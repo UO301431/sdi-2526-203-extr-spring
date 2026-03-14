@@ -1,9 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121;
 
-import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_HomeView;
-import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_Properties;
-import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_SignUpView;
-import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_View;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.*;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -115,6 +112,46 @@ class Sdi2526Entrega121ApplicationTests {
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
+
+    @Test
+    @Order(6)
+    void PR05() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(7)
+    void PR06() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678K", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(8)
+    void PR07() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "123", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+    @Test
+    @Order(9)
+    void PR08() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
 
 
 }
