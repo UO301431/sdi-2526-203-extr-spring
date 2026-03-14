@@ -1,9 +1,11 @@
 package com.uniovi.sdi.sdi2526entrega121.controllers;
 
+import com.uniovi.sdi.sdi2526entrega121.dtos.ChangePasswordDto;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.RolesService;
 import com.uniovi.sdi.sdi2526entrega121.services.SecurityService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
+import com.uniovi.sdi.sdi2526entrega121.validators.ChangePasswordValidator;
 import com.uniovi.sdi.sdi2526entrega121.validators.SignUpFormValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,12 +33,14 @@ public class UsersController {
     private final SecurityService securityService;
     private final RolesService rolesService;
     private final SignUpFormValidator signUpFormValidator;
+    private final ChangePasswordValidator changePasswordValidator;
 
-    public UsersController(UsersService usersService, SecurityService securityService, RolesService rolesService, SignUpFormValidator signUpFormValidator) {
+    public UsersController(UsersService usersService, SecurityService securityService, RolesService rolesService, SignUpFormValidator signUpFormValidator, ChangePasswordValidator changePasswordValidator) {
         this.usersService = usersService;
         this.securityService = securityService;
         this.rolesService = rolesService;
         this.signUpFormValidator = signUpFormValidator;
+        this.changePasswordValidator = changePasswordValidator;
     }
 
     /**
@@ -94,6 +98,28 @@ public class UsersController {
     @GetMapping("/login")
     public String login(){
         return "login";
+    }
+
+    @GetMapping("/profile/password")
+    public String getChangePassword(Model model){
+        model.addAttribute("passwordDto", new ChangePasswordDto());
+        return "user/profile-password";
+    }
+
+    @PostMapping("/profile/password")
+    public String setChangePassword(@ModelAttribute("passwordDto") ChangePasswordDto dto,
+                                    BindingResult result,
+                                    Principal principal,
+                                    Model model){
+        String dni = principal.getName();
+        changePasswordValidator.setUserDni(dni);
+        changePasswordValidator.validate(dto,result);
+        if(result.hasErrors()){
+            return "user/profile-password";
+        }
+
+        usersService.changeUserPassword(dni, dto);
+        return "redirect:/home";
     }
 }
 
