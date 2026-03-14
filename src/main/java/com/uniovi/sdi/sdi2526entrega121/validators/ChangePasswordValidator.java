@@ -14,7 +14,7 @@ import org.springframework.validation.Validator;
 public class ChangePasswordValidator implements Validator {
     private final UsersService usersService;
     private String userDni;
-    private BCryptPasswordEncoder encoder;
+    private final BCryptPasswordEncoder encoder;
 
 
     public String getUserDni() {

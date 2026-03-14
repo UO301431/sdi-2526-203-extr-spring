@@ -100,12 +100,29 @@ public class UsersController {
         return "login";
     }
 
+    /**
+     * Muestra el formulario para cambiar la contraseña del usuario que esta autenticado
+     * Este metodo crea un objeto {@link ChangePasswordDto} vacio y lo añade al modelo
+     * para que el formulario pueda enlazar sus campos con dicho objeto.
+     * La vista devuelta corresponde a la pagina de cambio de contraseña del perfil
+     *
+     * @param model modelo de Spring utilizado para enviar atributos a la vista
+     * @return nombre de la vista que contiene el formulario de cambio de contraseña
+     */
     @GetMapping("/profile/password")
     public String getChangePassword(Model model){
         model.addAttribute("passwordDto", new ChangePasswordDto());
         return "user/profile-password";
     }
 
+    /**
+     * Procesa la solicitud de cambio de contraseña enviada por el usuario
+     * @param dto objeto que contiene los datos introducidos en el formulario de cambio
+     * @param result objeto que almacena los errores de validacion
+     * @param principal objeto que contiene la informacion del usuario autenticado
+     * @param model modelo de Spring utilizado para enviar atributos a la vista
+     * @return redireccion a la pagina principal si el cambio de contraseña es correcto, en caso contrario, devuelve la vista con el formulario de errores
+     */
     @PostMapping("/profile/password")
     public String setChangePassword(@ModelAttribute("passwordDto") ChangePasswordDto dto,
                                     BindingResult result,
