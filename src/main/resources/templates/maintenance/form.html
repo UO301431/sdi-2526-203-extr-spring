@@ -1,0 +1,48 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2>
+        <span th:text="#{block.form.title}">Nuevo Bloqueo de Mantenimiento</span>
+        <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
+    </h2>
+    <!-- TODO cambiar por error message-->
+    <!--<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>-->
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <form th:action="@{/blocks/new/{id}(id=${spaceId})}" method="post">
+
+        <div class="form-group mb-3">
+            <label for="startDate" th:text="#{block.field.start}">Inicio</label>
+            <input type="datetime-local" id="startDate" name="startDate" class="form-control"
+                   th:value="${startDate != null ? #temporals.format(startDate, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                   required/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="endDate" th:text="#{block.field.end}">Fin</label>
+            <input type="datetime-local" id="endDate" name="endDate" class="form-control"
+                   th:value="${endDate != null ? #temporals.format(endDate, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                   required/>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="reason" th:text="#{block.field.reason}">Motivo</label>
+            <input type="text" id="reason" name="reason" class="form-control"
+                   th:value="${reason}" required/>
+        </div>
+
+        <button type="submit" class="btn btn-success"
+                th:text="#{block.form.submit}">Crear Bloqueo</button>
+        <a th:href="@{/blocks/list/{id}(id=${spaceId})}"
+           class="btn btn-secondary" th:text="#{common.cancel}">Cancelar</a>
+    </form>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

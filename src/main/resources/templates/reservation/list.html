@@ -1,0 +1,126 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html th:lang="${#locale.language}" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+    <h2 th:text="#{reservation.list.title}">Listado Global de Reservas</h2>
+
+    <form class="form-inline" action="/reservations/list" method="GET">
+        <div class="form-group">
+            <label for="spaceId" th:text="#{reservation.filter.space}">Espacio:</label>
+            <select name="spaceId" id="spaceId" class="form-control">
+                <option value="" th:text="#{reservation.filter.allSpaces}">Todos los espacios</option>
+                <option th:each="space : ${spaces}"
+                        th:value="${space.id}"
+                        th:text="${space.name}"
+                        th:selected="${param.spaceId != null and param.spaceId[0] == space.id.toString()}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="status" th:text="#{reservation.filter.status}">Estado:</label>
+            <select name="status" id="status" class="form-control">
+                <option value="" th:text="#{reservation.filter.allStatus}">Todos</option>
+                <option th:each="stat : ${statuses}"
+                        th:value="${stat.name()}"
+                        th:text="#{${'status.' + stat.name()}}"
+                        th:selected="${param.status != null and param.status[0] == stat.name()}">
+                </option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="startDate" th:text="#{reservation.filter.from}">Desde:</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" th:value="${param.startDate}">
+        </div>
+
+        <div class="form-group">
+            <label for="endDate" th:text="#{reservation.filter.to}">Hasta:</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" th:value="${param.endDate}">
+        </div>
+
+        <button type="submit" class="btn btn-primary" th:text="#{button.search}">Buscar</button>
+    </form>
+
+    <p th:text="#{reservation.list.description}">Listado de todas las reservas registradas en el sistema (activas y canceladas).</p>
+
+    <div class="mb-3">
+        <button type="button" id="updateButton" class="btn btn-secondary" th:text="#{button.update}">Actualizar</button>
+
+        <a sec:authorize="hasRole('ROLE_ADMIN')"
+           th:href="@{/reservations/export(spaceId=${param.spaceId}, status=${param.status}, startDate=${param.startDate}, endDate=${param.endDate})}"
+           class="btn btn-success ms-2"> Exportar a CSV
+        </a>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        $("#updateButton").click(function () {
+            let page = /*[[${param.page != null and !#lists.isEmpty(param.page) ? param.page[0] : null}]]*/ null;
+            let spaceId = $("#spaceId").val() || /*[[${param.spaceId != null and !#lists.isEmpty(param.spaceId) ? param.spaceId[0] : ''}]]*/ '';
+            let status = $("#status").val() || /*[[${param.status != null and !#lists.isEmpty(param.status) ? param.status[0] : ''}]]*/ '';
+            let startDate = $("#startDate").val() || /*[[${param.startDate != null and !#lists.isEmpty(param.startDate) ? param.startDate[0] : ''}]]*/ '';
+            let endDate = $("#endDate").val() || /*[[${param.endDate != null and !#lists.isEmpty(param.endDate) ? param.endDate[0] : ''}]]*/ '';
+
+            let urlUpdate = '/reservations/update?';
+
+            if (page != null) urlUpdate += "page=" + page + "&";
+            if (spaceId !== '') urlUpdate += "spaceId=" + spaceId + "&";
+            if (status !== '') urlUpdate += "status=" + status + "&";
+            if (startDate !== '') urlUpdate += "startDate=" + startDate + "&";
+            if (endDate !== '') urlUpdate += "endDate=" + endDate;
+
+            $("#tableReservation").load(urlUpdate);
+        });
+        /*]]>*/
+    </script>
+
+    <div class="table-responsive">
+        <div th:fragment="tableReservation" id="tableReservation">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th th:text="#{reservation.table.user}">Usuario</th>
+                    <th th:text="#{reservation.table.space}">Espacio</th>
+                    <th th:text="#{reservation.table.start}">Inicio</th>
+                    <th th:text="#{reservation.table.end}">Fin</th>
+                    <th th:text="#{reservation.table.status}">Estado</th>
+                    <th sec:authorize="hasRole('ROLE_EMPLOYEE')" th:text="#{reservation.table.actions}">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="res : ${reservations}">
+                    <td th:text="${res.user.dni + ' - ' + res.user.name}">DNI - Nombre</td>
+                    <td th:text="${res.space.name}">Nombre Espacio</td>
+                    <td th:text="${#temporals.format(res.startDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 10:00</td>
+                    <td th:text="${#temporals.format(res.endDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 12:00</td>
+                    <td th:text="#{${'status.' + res.status}}">ACTIVA</td>
+                    <td sec:authorize="hasRole('ROLE_EMPLOYEE')">
+                        <a th:if="${res.status.name() == 'ACTIVE'}"
+                           th:href="@{'/reservations/cancel/' + ${res.id}}"
+                           class="btn btn-danger btn-sm" th:text="#{button.cancel}">Cancelar</a>
+
+                        <a th:unless="${res.status.name() == 'ACTIVE'}"
+                           href="#"
+                           class="btn btn-secondary btn-sm disabled"
+                           aria-disabled="true" th:text="#{status.CANCELLED}">Cancelada</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(reservations)}" class="alert alert-info mt-3" th:text="#{reservation.empty}">
+        No hay reservas que coincidan con los criterios de búsqueda.
+    </div>
+
+    <footer th:replace="fragments/pagination"></footer>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

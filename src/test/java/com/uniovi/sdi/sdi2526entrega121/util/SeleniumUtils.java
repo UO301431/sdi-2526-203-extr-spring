@@ -1,5 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.util;
 
+
 import org.junit.jupiter.api.Assertions;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -87,25 +88,5 @@ public class SeleniumUtils {
         };
 
         return waitLoadElementsByXpath(driver, searchCriterion, timeout);
-	}
-
-
-	/**
-	 * PROHIBIDO USARLO PARA VERSIÓN FINAL.
-	 * Esperar "segundos" durante la ejecucion del navegador 
-	 * @param driver: apuntando al navegador abierto actualmente.
-	 * @param seconds: Segundos de bloqueo de la ejecución en el navegador.
-	 */
-	static public void waitSeconds(WebDriver driver, int seconds){
-
-		//noinspection SynchronizationOnLocalVariableOrMethodParameter
-		synchronized(driver){
-			try {
-				driver.wait(seconds * 1000L);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 }

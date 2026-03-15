@@ -1,0 +1,74 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html lang="es" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://thymeleaf.org">
+<head th:replace="fragments/head"></head>
+<body>
+<nav th:replace="fragments/nav"></nav>
+
+<div class="container" id="main-container">
+  <h2>
+    <span th:text="#{block.list.title}">Bloqueos de Mantenimiento</span>
+    <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
+  </h2>
+  <!--TODO cambiar por success mesage-->
+  <!--<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>-->
+  <!--TODO cambiar por error mesage-->
+  <!--<div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>-->
+
+  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+
+  <a th:href="@{/blocks/new/{id}(id=${spaceId})}"
+     class="btn btn-success mb-3"
+     th:text="#{block.action.new}">
+    Nuevo Bloqueo
+  </a>
+  <a href="/spaces/list" class="btn btn-secondary mb-3"
+     th:text="#{common.back}">Volver</a>
+
+  <div class="table-responsive">
+    <table class="table table-striped table-hover" id="blocksTable">
+      <thead>
+      <tr>
+        <th th:text="#{block.field.start}">Inicio</th>
+        <th th:text="#{block.field.end}">Fin</th>
+        <th th:text="#{block.field.reason}">Motivo</th>
+        <th th:text="#{block.field.status}">Estado</th>
+        <th th:text="#{space.field.actions}">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="block : ${blocks}" th:id="'block-' + ${block.id}">
+        <td th:text="${#temporals.format(block.startDate, 'dd/MM/yyyy HH:mm')}">01/01/2026 09:00</td>
+        <td th:text="${#temporals.format(block.endDate,   'dd/MM/yyyy HH:mm')}">01/01/2026 18:00</td>
+        <td th:text="${block.reason}">Mantenimiento</td>
+        <td>
+    <span th:if="${block.status.name() == 'ACTIVE'}"
+          class="badge bg-danger"
+          th:text="${block.status}">ACTIVE</span>
+
+          <span th:unless="${block.status.name() == 'ACTIVE'}"
+                class="badge bg-secondary"
+                th:text="${block.status}">CANCELLED</span>
+        </td>
+        <td>
+          <form th:if="${block.status.name() == 'ACTIVE'}"
+                th:action="@{/blocks/cancel/{id}(id=${block.id})}"
+                method="post" style="display:inline;">
+            <button type="submit" class="btn btn-sm btn-warning"
+                    th:text="#{block.action.cancel}">Cancelar</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div th:if="${#lists.isEmpty(blocks)}" class="alert alert-info">
+    <span th:text="#{block.list.empty}">No hay bloqueos para este espacio.</span>
+  </div>
+
+  <footer th:replace="fragments/pagination"></footer>
+</div>
+<footer th:replace="fragments/footer"></footer>
+</body>
+</html>

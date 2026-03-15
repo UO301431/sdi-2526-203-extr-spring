@@ -8,15 +8,16 @@ import org.openqa.selenium.WebElement;
 import java.util.List;
 
 public class PO_NavView extends PO_View{
+
     /**
-            * Clic en una de las opciones principales (a href) y comprueba que se vaya a la vista con el elemento de
-    tipo type con el texto Destino
- * @param driver: apuntando al navegador abierto actualmente.
- * @param textOption: Texto de la opción principal.
- * @param criterio: "id" or "class" or "text" or "@attribute" or "free". Si el valor de criterio es free es una
+     * Clic en una de las opciones principales (a href) y comprueba que se vaya a la vista con el elemento de
+     tipo type con el texto Destino
+     * @param driver: apuntando al navegador abierto actualmente.
+     * @param textOption: Texto de la opción principal.
+     * @param criterio: "id" or "class" or "text" or "@attribute" or "free". Si el valor de criterio es free es una
     expresion xpath completa.
- * @param targetText: texto correspondiente a la búsqueda de la página destino.
- */
+     * @param targetText: texto correspondiente a la búsqueda de la página destino.
+     */
     public static void clickOption(WebDriver driver, String textOption, String criterio, String targetText) {
         //CLickamos en la opción de registro y esperamos a que se cargue el enlace de Registro.
         List<WebElement> elements = SeleniumUtils.waitLoadElementsBy(driver, "@href", textOption,
@@ -48,5 +49,5 @@ public class PO_NavView extends PO_View{
                 getTimeout());
         SelectedLanguage.getFirst().click();
     }
-}
 
+}
