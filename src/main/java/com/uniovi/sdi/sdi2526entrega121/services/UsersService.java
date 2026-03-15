@@ -1,5 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
+import com.uniovi.sdi.sdi2526entrega121.dtos.ChangePasswordDto;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.repositories.UsersRepository;
 import jakarta.annotation.PostConstruct;
@@ -40,5 +41,12 @@ public class UsersService {
 
     public User getUserByDni(String dni) {
         return usersRepository.findByDni(dni);
+    }
+
+    public void changeUserPassword(String dni, ChangePasswordDto dto){
+        User user = usersRepository.findByDni(dni);
+
+        user.setPassword(bCryptPasswordEncoder.encode(dto.getPassword()));
+        usersRepository.save(user);
     }
 }
