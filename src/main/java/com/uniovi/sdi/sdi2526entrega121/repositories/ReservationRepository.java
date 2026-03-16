@@ -35,10 +35,10 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                 @Param("endDate") LocalDateTime endDate,
                                 @Param("status") ReservationStatus status);
 
-    @Query("SELECT COUNT(mb) > 0 FROM MaintenanceBlock mb " +
-            "WHERE mb.space.id = :spaceId " +
-            "AND mb.status = 'ACTIVE' " +
-            "AND mb.startDate < :endDate AND mb.endDate > :startDate")
+    @Query("SELECT COUNT(b) > 0 FROM Block b " +
+            "WHERE b.space.id = :spaceId " +
+            "AND b.status = 'ACTIVE' " +
+            "AND b.startDate < :endDate AND b.endDate > :startDate")
     boolean existsActiveBlockOverlap(@Param("spaceId") Long spaceId,
                                      @Param("startDate") LocalDateTime startDate,
                                      @Param("endDate") LocalDateTime endDate);

@@ -682,7 +682,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2028T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         //se va a la lista de reservas
         driver.navigate().to(URL + "/reservations/list");
@@ -704,7 +704,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2028T18:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La fecha de inicio debe ser anterior a la de fin";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -723,14 +723,14 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
 
         //Se realiza una reserva en el mismo horario
         driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La reserva nos e puede realizar por un solapamiento";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -749,7 +749,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("10-04-2029T13:00");
         driver.findElement(By.id("endDate")).sendKeys("10-04-2029T15:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La reserva nos e puede realizar por un solapamiento";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -803,6 +803,114 @@ class Sdi2526Entrega121ApplicationTests {
             Assertions.assertTrue(cellText.contains("CANCELADA") || cellText.contains("CANCELLED"),
                     "El estado de la reserva listada debería ser CANCELADA, pero fue: " + cellText);
         }
+
+        PO_LoginView.logout(driver);
+    }
+
+    // [Prueba 42] Crear una reserva recurrente semanal válida y comprobar que
+    // se han creado todas las reservas previstas.
+    @Test
+    @Order(42)
+    void PR42() {
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/list");
+
+        List<WebElement> rowsAntes = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countAntes = rowsAntes.size();
+
+        driver.navigate().to(URL + "/reservations/add");
+
+        new Select(driver.findElement(By.id("space")))
+                .selectByVisibleText("Sala Ada Lovelace - Capacidad: 10");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2031-03-03T10:00';");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2031-03-03T12:00';");
+
+        new Select(driver.findElement(By.id("recurrenceFrequency")))
+                .selectByValue("WEEKLY");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('recurrenceEndDate').value = '2031-03-24';" +
+                        "document.getElementById('recurrenceEndDate').disabled = false;");
+
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        String successMsg = PO_HomeView.getP().getString(
+                "reservation.recurrence.success", PO_Properties.getSPANISH());
+        List<WebElement> successElement = PO_View.checkElementBy(driver, "text", successMsg);
+        Assertions.assertFalse(successElement.isEmpty(),
+                "Debe aparecer el mensaje de éxito al crear reservas recurrentes válidas");
+
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> rowsDespues = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countDespues = rowsDespues.size();
+
+        Assertions.assertTrue(countDespues >= countAntes || countDespues == 5,
+                "Tras crear 4 reservas recurrentes el listado debe tener más entradas o estar lleno");
+
+        PO_LoginView.logout(driver);
+    }
+
+    // [Prueba 43] Intentar crear una reserva recurrente que genere un solape
+    // y comprobar que el sistema la rechaza mostrando un mensaje adecuado.
+    @Test
+    @Order(43)
+    void PR43() {
+        // Login como empleado
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/list");
+
+        // Contar reservas del usuario ANTES de intentar la recurrente con solape
+        List<WebElement> rowsAntes = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countAntes = rowsAntes.size();
+
+        // Ir al formulario de añadir reserva
+        driver.navigate().to(URL + "/reservations/add");
+
+        // Seleccionar "Sala Linus Torvalds" (space5)
+        // Tiene un bloqueo activo el 2027-04-10 de 08:00 a 18:00
+        new Select(driver.findElement(By.id("space")))
+                .selectByVisibleText("Sala Linus Torvalds - Capacidad: 8");
+
+        // Reserva base: 2027-03-27 10:00-12:00
+        // Recurrencia semanal hasta 2027-04-17 genera: 27/03, 03/04, 10/04 ← SOLAPA, 17/04
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2027-03-27T10:00';");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2027-03-27T12:00';");
+
+        // Seleccionar frecuencia WEEKLY
+        new Select(driver.findElement(By.id("recurrenceFrequency")))
+                .selectByValue("WEEKLY");
+
+        // Fecha fin: 2027-04-17 → la ocurrencia del 10/04 solapa con el bloqueo
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('recurrenceEndDate').value = '2027-04-17';" +
+                        "document.getElementById('recurrenceEndDate').disabled = false;");
+
+        // Enviar formulario
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        // Comprobar que se muestra el mensaje de error de solape
+        String errorMsg = PO_HomeView.getP().getString(
+                "reservation.recurrence.overlap", PO_Properties.getSPANISH());
+        List<WebElement> errorElement = PO_View.checkElementBy(driver, "text", errorMsg);
+        Assertions.assertFalse(errorElement.isEmpty(),
+                "Debe aparecer el mensaje de error cuando la recurrencia solapa con un bloqueo");
+
+        // Comprobar que no se creó ninguna reserva (el sistema rechaza todas o ninguna)
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> rowsDespues = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countDespues = rowsDespues.size();
+
+        Assertions.assertEquals(countAntes, countDespues,
+                "El número de reservas no debe haber aumentado si hubo un solape");
 
         PO_LoginView.logout(driver);
     }

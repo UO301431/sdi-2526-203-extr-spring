@@ -37,6 +37,33 @@
 
             </div>
         </div>
+        <!-- Sección de reserva recurrente -->
+        <div class="form-group">
+            <label class="control-label col-sm-2" th:text="#{reservation.recurrence.frequency}">Frecuencia:</label>
+            <div class="col-sm-10">
+                <select id="recurrenceFrequency" name="recurrenceFrequency" class="form-control">
+                    <option value="" th:text="#{reservation.recurrence.none}">Sin recurrencia</option>
+                    <option value="DAILY" th:text="#{reservation.recurrence.DAILY}">Diaria</option>
+                    <option value="WEEKLY" th:text="#{reservation.recurrence.WEEKLY}">Semanal</option>
+                    <option value="MONTHLY" th:text="#{reservation.recurrence.MONTHLY}">Mensual</option>
+                    <option value="YEARLY" th:text="#{reservation.recurrence.YEARLY}">Anual</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" id="recurrenceEndDateGroup">
+            <label class="control-label col-sm-2" th:text="#{reservation.recurrence.endDate}">Fecha fin recurrencia:</label>
+            <div class="col-sm-10">
+                <input type="date" id="recurrenceEndDate" name="recurrenceEndDate" class="form-control">
+            </div>
+        </div>
+
+        <!-- Mensajes de resultado -->
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <span class="text-danger" th:if="${errorMessage != null}" th:text="#{__${errorMessage}__}"></span>
+                <span class="text-success" th:if="${successMessage != null}" th:text="#{__${successMessage}__}"></span>
+            </div>
+        </div>
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
                 <button type="submit" class="btn btn-primary" th:text="#{reservation.submit}">Reservar</button>

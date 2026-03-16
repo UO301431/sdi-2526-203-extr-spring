@@ -1,5 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.controllers;
 
+import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
@@ -163,18 +164,45 @@ public class ReservationsController {
     public String setReservation(@ModelAttribute Reservation reservation,
                                  Principal principal,
                                  BindingResult result,
-                                 Model model){
+                                 Model model,
+                                 @RequestParam(value = "recurrenceFrequency", required = false) RecurrenceFrequency recurrenceFrequency,
+                                 @RequestParam(value = "recurrenceEndDate", required = false)
+                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate recurrenceEndDate) {
+
         model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
+
         String dni = principal.getName();
         User user = usersService.getUserByDni(dni);
         reservation.setUser(user);
 
+        // Validación básica de fechas (la que ya existía)
         addReservationValidator.validate(reservation, result);
         if(result.hasErrors()){
             return "reservation/add";
         }
 
-        reservationsService.addReservation(reservation);
+        // Sin recurrencia: flujo normal ya existente
+        if (recurrenceFrequency == null || recurrenceEndDate == null) {
+            reservationsService.addReservation(reservation);
+            model.addAttribute("successMessage", "reservation.add.success");
+            return "reservation/add";
+        }
+
+        // Validar que la fecha fin de recurrencia sea posterior al inicio
+        if (recurrenceEndDate.isBefore(reservation.getStartDate().toLocalDate())) {
+            model.addAttribute("errorMessage", "reservation.recurrence.endDateBeforeStart");
+            return "reservation/add";
+        }
+
+        boolean created = reservationsService.createRecurringReservations(
+                reservation, recurrenceFrequency, recurrenceEndDate);
+
+        if (!created) {
+            model.addAttribute("errorMessage", "reservation.recurrence.overlap");
+        } else {
+            model.addAttribute("successMessage", "reservation.recurrence.success");
+        }
+
         return "reservation/add";
     }
 
