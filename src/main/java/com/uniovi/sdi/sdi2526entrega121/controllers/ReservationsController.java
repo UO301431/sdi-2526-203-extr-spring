@@ -6,6 +6,7 @@ import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
+import com.uniovi.sdi.sdi2526entrega121.validators.AddReservationValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,14 +42,16 @@ public class ReservationsController {
     private SpaceService spaceService;
 
     private final UsersService usersService;
+    private final AddReservationValidator addReservationValidator;
 
     /**
      * Constructor del controlador que inyecta el servicio de usuarios.
      *
      * @param usersService Servicio para la gestión de usuarios.
      */
-    public ReservationsController(UsersService usersService) {
+    public ReservationsController(UsersService usersService, AddReservationValidator addReservationValidator) {
         this.usersService = usersService;
+        this.addReservationValidator = addReservationValidator;
     }
 
     /**
@@ -157,10 +161,19 @@ public class ReservationsController {
      */
     @PostMapping("/reservations/add")
     public String setReservation(@ModelAttribute Reservation reservation,
-                                 Principal principal){
+                                 Principal principal,
+                                 BindingResult result,
+                                 Model model){
+        model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
         String dni = principal.getName();
         User user = usersService.getUserByDni(dni);
         reservation.setUser(user);
+
+        addReservationValidator.validate(reservation, result);
+        if(result.hasErrors()){
+            return "reservation/add";
+        }
+
         reservationsService.addReservation(reservation);
         return "reservation/add";
     }
