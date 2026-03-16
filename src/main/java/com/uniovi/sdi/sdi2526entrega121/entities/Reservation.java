@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "reservations")
@@ -34,6 +35,16 @@ public class Reservation {
     private ReservationStatus status = ReservationStatus.ACTIVE;
 
     private Boolean isRecurring = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true)
+    private RecurrenceFrequency recurrenceFrequency;
+
+    @Column(nullable = true)
+    private LocalDate recurrenceEndDate;
+
+    @Column(nullable = true)
+    private Long recurrenceGroupId;
 
     public Reservation() {}
 
@@ -76,4 +87,13 @@ public class Reservation {
 
     public Boolean getIsRecurring() { return isRecurring; }
     public void setIsRecurring(Boolean recurring) { isRecurring = recurring; }
+
+    public RecurrenceFrequency getRecurrenceFrequency() { return recurrenceFrequency; }
+    public void setRecurrenceFrequency(RecurrenceFrequency recurrenceFrequency) { this.recurrenceFrequency = recurrenceFrequency; }
+
+    public LocalDate getRecurrenceEndDate() { return recurrenceEndDate; }
+    public void setRecurrenceEndDate(LocalDate recurrenceEndDate) { this.recurrenceEndDate = recurrenceEndDate; }
+
+    public Long getRecurrenceGroupId() { return recurrenceGroupId; }
+    public void setRecurrenceGroupId(Long recurrenceGroupId) { this.recurrenceGroupId = recurrenceGroupId; }
 }
