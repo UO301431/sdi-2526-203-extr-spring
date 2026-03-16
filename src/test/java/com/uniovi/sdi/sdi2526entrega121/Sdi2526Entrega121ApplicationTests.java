@@ -716,7 +716,18 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(29)
     void PR29(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/spaces/list");
+
+        driver.findElement(By.xpath("/html/body/div/div/div[1]/table/tbody/tr[4]/td[6]/a")).click();
+        driver.findElement(By.id("startDate")).sendKeys("01-01-2026T01:00");
+        driver.findElement(By.id("endDate")).sendKeys("29-12-2027T23:50");
+        driver.findElement(By.xpath("/html/body/div/form/div/button")).click();
+
+        String checkText = "RESERVA";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+        Assertions.assertEquals(checkText, result.getLast().getText());
     }
 
     //Registrar una reserva valida
