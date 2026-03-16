@@ -3,6 +3,7 @@ package com.uniovi.sdi.sdi2526entrega121.controllers;
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
+import com.uniovi.sdi.sdi2526entrega121.services.ReservaSecurityService;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,9 @@ public class ReservationsController {
 
     @Autowired
     private ReservationsService reservationsService;
+
+    @Autowired
+    private ReservaSecurityService reservaSecurityService;
 
     @Autowired
     private SpaceService spaceService;
@@ -125,6 +130,7 @@ public class ReservationsController {
      * @return Redirección a la vista del listado de reservas.
      */
     @RequestMapping(value = "/reservations/cancel/{id}")
+    @PreAuthorize("@reservaSecurityService.isOwner(authentication, #id)")
     public String cancelReservation(@PathVariable Long id, Principal principal) {
         String dni = principal.getName();
 

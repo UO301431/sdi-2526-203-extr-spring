@@ -8,6 +8,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -63,8 +64,9 @@ public class SpaceController {
     // ── AJAX: fragmento de tabla para el toggle ───────────────────────────────
 
     @GetMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updateSpacesTable(Model model, Pageable pageable) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         Page<Space> spaces = spaceService.getSpaces(pageable);
         model.addAttribute("spaces", spaces.getContent());
         model.addAttribute("page", spaces);
@@ -74,8 +76,9 @@ public class SpaceController {
     // ── Toggle activo/inactivo (solo admin) ───────────────────────────────────
 
     @PostMapping("/toggle/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String toggleSpace(@PathVariable Long id, Model model, Pageable pageable) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         spaceService.toggleActive(id);
         Page<Space> spaces = spaceService.getSpaces(pageable);
         model.addAttribute("spaces", spaces.getContent());
@@ -86,19 +89,22 @@ public class SpaceController {
     // ── Formulario nuevo espacio (solo admin) ─────────────────────────────────
 
     @GetMapping("/new")
+    @PreAuthorize("hasRole('ADMIN')")
     public String newSpaceForm(Model model) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
+
         model.addAttribute("space", new Space());
         model.addAttribute("spaceTypes", SpaceType.values());
         return "space/form";
     }
 
     @PostMapping("/new")
+    @PreAuthorize("hasRole('ADMIN')")
     public String createSpace(@ModelAttribute Space space,
                               Model model,
                               RedirectAttributes redirectAttrs,
                               Locale locale) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         String error = spaceService.addSpace(space);
         if (error != null) {
             //No esta internacionalizado
@@ -117,8 +123,9 @@ public class SpaceController {
     // ── Formulario editar espacio (solo admin) ────────────────────────────────
 
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String editSpaceForm(@PathVariable Long id, Model model) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //sif (!isAdmin()) return "redirect:/spaces/list";
         Optional<Space> opt = spaceService.findById(id);
         if (opt.isEmpty()) return "redirect:/spaces/list";
         model.addAttribute("space", opt.get());
@@ -127,12 +134,13 @@ public class SpaceController {
     }
 
     @PostMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String updateSpace(@PathVariable Long id,
                               @ModelAttribute Space space,
                               Model model,
                               RedirectAttributes redirectAttrs,
                               Locale locale) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         String error = spaceService.editSpace(id, space);
         if (error != null) {
             //No esta internacionalizado
