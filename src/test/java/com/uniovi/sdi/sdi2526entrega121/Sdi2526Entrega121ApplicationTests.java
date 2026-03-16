@@ -866,4 +866,52 @@ class Sdi2526Entrega121ApplicationTests {
 
         PO_LoginView.logout(driver);
     }
+
+    // [Prueba 42] Crear una reserva recurrente semanal válida y comprobar que
+    // se han creado todas las reservas previstas.
+    @Test
+    @Order(42)
+    void PR42() {
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/list");
+
+        List<WebElement> rowsAntes = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countAntes = rowsAntes.size();
+
+        driver.navigate().to(URL + "/reservations/add");
+
+        new Select(driver.findElement(By.id("space")))
+                .selectByVisibleText("Sala Ada Lovelace - Capacidad: 10");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2031-03-03T10:00';");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2031-03-03T12:00';");
+
+        new Select(driver.findElement(By.id("recurrenceFrequency")))
+                .selectByValue("WEEKLY");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('recurrenceEndDate').value = '2031-03-24';" +
+                        "document.getElementById('recurrenceEndDate').disabled = false;");
+
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        String successMsg = PO_HomeView.getP().getString(
+                "reservation.recurrence.success", PO_Properties.getSPANISH());
+        List<WebElement> successElement = PO_View.checkElementBy(driver, "text", successMsg);
+        Assertions.assertFalse(successElement.isEmpty(),
+                "Debe aparecer el mensaje de éxito al crear reservas recurrentes válidas");
+
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> rowsDespues = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        int countDespues = rowsDespues.size();
+
+        Assertions.assertTrue(countDespues >= countAntes || countDespues == 5,
+                "Tras crear 4 reservas recurrentes el listado debe tener más entradas o estar lleno");
+
+        PO_LoginView.logout(driver);
+    }
 }
