@@ -22,6 +22,7 @@
                 <label class="control-label col-sm-2" for="startDate" th:text="#{reservation.startDate}">Fecha inicio reserva:</label>
                 <div class="col-sm-10">
                     <input type="datetime-local" id="startDate" name="startDate" class="form-control" required >
+                    <span class="text-danger" th:if="${#fields.hasErrors('startDate')}" th:errors="*{startDate}"></span>
                 </div>
 
                 <label class="control-label col-sm-2" for="endDate" th:text="#{reservation.endDate}">Fecha fin reserva:</label>

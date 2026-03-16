@@ -734,14 +734,41 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(30)
     void PR30(){
-        //TODO
+
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/add");
+
+        //rellenar datos reserva
+        driver.findElement(By.id("startDate")).sendKeys("12-01-2028T14:00");
+        driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
+
+        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+
+        //se va a la lista de reservas
+        driver.navigate().to(URL + "/reservations/list");
+        driver.findElement(By.xpath("/html/body/div/div[3]/ul/li[3]/a")).click();
+
+        String checkText = "Sala Ada Lovelace";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     //Registrar una reserva inválida (inicio posterior al fin)
     @Test
     @Order(31)
     void PR31(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/add");
+
+        //rellenar datos reserva
+        driver.findElement(By.id("startDate")).sendKeys("12-01-2028T18:00");
+        driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
+
+        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+
+        String checkText = "La fecha de inicio debe ser anterior a la de fin";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     //Crear dos reservas solapadas en el mismo espacio (la primera es válida, pero la segunda

@@ -1,12 +1,14 @@
 package com.uniovi.sdi.sdi2526entrega121.validators;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.time.LocalDateTime;
 
-public class addReservationValidator implements Validator {
+@Component
+public class AddReservationValidator implements Validator {
 
 
     @Override
@@ -28,5 +30,7 @@ public class addReservationValidator implements Validator {
         if(reservation.getStartDate().isBefore(today)){
             errors.rejectValue("startDate", "Error.date.startDateAfterToday");
         }
+
+
     }
 }
