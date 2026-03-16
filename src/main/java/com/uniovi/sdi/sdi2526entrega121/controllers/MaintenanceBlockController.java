@@ -76,9 +76,9 @@ public class MaintenanceBlockController {
 
         String error = blockService.createBlock(spaceId, startDate, endDate, reason);
         if (error != null) {
-            //No esta internacionalizado
-            //model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
-            model.addAttribute("error", error);
+
+            model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
+
             model.addAttribute("spaceId", spaceId);
             model.addAttribute("startDate", startDate);
             model.addAttribute("endDate", endDate);
@@ -86,9 +86,9 @@ public class MaintenanceBlockController {
             spaceService.findById(spaceId).ifPresent(s -> model.addAttribute("space", s));
             return "maintenance/form";
         }
-        //TODO cambiar cuando este internacionalizado
-        /*redirectAttrs.addFlashAttribute("successMessage",
-                messageSource.getMessage("block.success.created", null, locale));*/
+
+        redirectAttrs.addFlashAttribute("successMessage",
+                messageSource.getMessage("block.success.created", null, locale));
         return "redirect:/blocks/list/" + spaceId;
     }
 
@@ -106,14 +106,13 @@ public class MaintenanceBlockController {
 
         String error = blockService.cancelBlock(blockId);
         if (error != null) {
-            //No esta internacionalizado
-            //TODO cambiar cuando este internacionalizado
-            //redirectAttrs.addFlashAttribute("errorMessage", messageSource.getMessage(error, null, locale));
-            redirectAttrs.addFlashAttribute("error", error);
+
+            redirectAttrs.addFlashAttribute("errorMessage", messageSource.getMessage(error, null, locale));
+
         } else {
-            //TODO cambiar cuando este internacionalizado
-            /*redirectAttrs.addFlashAttribute("successMessage",
-                    messageSource.getMessage("block.success.cancelled", null, locale));*/
+
+            redirectAttrs.addFlashAttribute("successMessage",
+                    messageSource.getMessage("block.success.cancelled", null, locale));
         }
 
         if (spaceId != null) {
