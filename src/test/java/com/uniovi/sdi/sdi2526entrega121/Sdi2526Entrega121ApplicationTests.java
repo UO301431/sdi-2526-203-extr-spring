@@ -1,10 +1,22 @@
 package com.uniovi.sdi.sdi2526entrega121;
 
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_HomeView;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_SignUpView;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.PO_View;
+import com.uniovi.sdi.sdi2526entrega121.pageobjects.*;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.*;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
+import java.util.List;
+
+import java.io.File;
+import java.nio.file.Files;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -13,25 +25,25 @@ import static org.junit.jupiter.api.Assertions.*;
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\geckodriver.exe";
+    static String Geckodriver = "C:\\geckodriver.exe";
 
-    static WebDriver driver = getDriver(PathFirefox/*, Geckodriver*/);
+    static WebDriver driver = getDriver(PathFirefox, Geckodriver);
     static String URL = "http://localhost:8090";
 
-    public static WebDriver getDriver(String PathFirefox/*, String Geckodriver*/) {
+    public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
-        //System.setProperty("webdriver.gecko.driver", Geckodriver);
+        System.setProperty("webdriver.gecko.driver", Geckodriver);
         driver = new FirefoxDriver();
         return driver;
     }
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(){
         driver.navigate().to(URL);
     }
 
     @AfterEach
-    public void tearDown() {
+    public void tearDown(){
         driver.manage().deleteAllCookies();
     }
 
@@ -40,8 +52,118 @@ class Sdi2526Entrega121ApplicationTests {
 
     @AfterAll
     static public void end() {
+        if(driver != null) {
         driver.quit();
+        }
     }
+
+    @Test
+    @Order(1)
+    void PRO1(){
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678K","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
+
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(2)
+    void PR02(){
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@");
+
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.passwordConfirm.coincidence",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.passwordConfirm.coincidence",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+    }
+
+    @Test
+    @Order(3)
+    void PR03(){
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+    }
+
+    @Test
+    @Order(4)
+    void PR04A(){ //Sin simbolos especiales
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+
+    }
+
+    @Test
+    @Order(5)
+    void PR04B(){ //Sin numeros
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(6)
+    void PR05() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(7)
+    void PR06() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678K", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(8)
+    void PR07() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "123", "@Dm1n1str@D0r");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+    @Test
+    @Order(9)
+    void PR08() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n");
+        String checkText = "";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -54,6 +176,15 @@ class Sdi2526Entrega121ApplicationTests {
 
     private String bodyText() {
         return driver.findElement(By.tagName("body")).getText();
+    }
+
+    private void comprobarPaginacion() {
+        // Busca el enlace a la página 2 y hace clic si existe
+        List<WebElement> page2 = driver.findElements(By.xpath("//a[contains(@href, 'page=2')]"));
+        if (!page2.isEmpty()) {
+            page2.get(0).click();
+            assertTrue(driver.getCurrentUrl().contains("page="), "La URL debe mantener la paginación");
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -440,5 +571,195 @@ class Sdi2526Entrega121ApplicationTests {
                 bodyText().contains("CANCELADO") || bodyText().contains("CANCELLED"),
                 "El bloqueo cancelado debe mostrarse con estado CANCELADO"
         );
+    }
+
+    @Test
+    @Order(23)
+    void PR23(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        PO_View.checkElementBy(driver, "text", "Estado");
+        PO_View.checkElementBy(driver, "text", "Usuario");
+        PO_View.checkElementBy(driver, "text", "Inicio");
+        PO_View.checkElementBy(driver, "text", "Espacio");
+        PO_View.checkElementBy(driver, "text", "Fin");
+
+        PO_PrivateView.checkPagination(driver);
+
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
+        int numeroDeFilas = filas.size();
+        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
+        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+    }
+
+    @Test
+    @Order(24)
+    void PR24(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
+
+        driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
+
+        assertTrue(driver.getCurrentUrl().contains("spaceId="), "La URL debe contener el filtro por espacio");
+
+        PO_PrivateView.checkPagination(driver);
+
+        assertTrue(driver.getCurrentUrl().contains("spaceId="), "El filtro de espacio debe mantenerse al cambiar de página");
+
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
+        int numeroDeFilas = filas.size();
+        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
+        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+    }
+
+    @Test
+    @Order(25)
+    void PR25(){
+
+
+        // TODO falta por corregir y terminar
+
+
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        driver.findElement(By.id("startDate")).sendKeys("2026-03-14");
+        driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
+
+        PO_PrivateView.findAndClick(driver, "free",
+                "//form[@action='/reservations/list']//button[@type='submit']", 0);
+
+        try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
+
+        assertTrue(driver.getCurrentUrl().contains("startDate="), "La URL debe contener la fecha de inicio");
+        assertTrue(driver.getCurrentUrl().contains("endDate="), "La URL debe contener la fecha de fin");
+
+        PO_PrivateView.checkPagination(driver);
+
+        assertTrue(driver.getCurrentUrl().contains("startDate="), "El filtro de fecha debe mantenerse al cambiar de página");
+    }
+
+    @Test
+    @Order(26)
+        //Consultar el listado de espacios disponibles
+    void PR26(){
+        //TODO
+    }
+
+    //Se aplica el filtro de capacidad con el valor 10
+    @Test
+    @Order(27)
+    void PR27(){
+        //TODO
+    }
+
+    //Se accede a los detalles del primer espacio
+    @Test
+    @Order(28)
+    void PR28(){
+        //TODO
+    }
+
+    //Se consulta la disponibilidad de un espacio
+    @Test
+    @Order(29)
+    void PR29(){
+        //TODO
+    }
+
+    //Registrar una reserva valida
+    @Test
+    @Order(30)
+    void PR30(){
+        //TODO
+    }
+
+    //Registrar una reserva inválida (inicio posterior al fin)
+    @Test
+    @Order(31)
+    void PR31(){
+        //TODO
+    }
+
+    //Crear dos reservas solapadas en el mismo espacio (la primera es válida, pero la segunda
+    //debe fallar).
+    @Test
+    @Order(32)
+    void PR32(){
+        //TODO
+    }
+
+    //Intentar reservar dentro de un bloqueo (debe fallar).
+    @Test
+    @Order(33)
+    void PR33(){
+        //TODO
+    }
+
+    @Test
+    @Order(34)
+    void PR34(){
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+
+        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
+        elements.get(0).click();
+
+        PO_View.checkElementBy(driver, "text", "Listado Global de Reservas");
+
+        PO_View.checkElementBy(driver, "text", "Espacio");
+        PO_View.checkElementBy(driver, "text", "Inicio");
+        PO_View.checkElementBy(driver, "text", "Fin");
+        PO_View.checkElementBy(driver, "text", "Estado");
+
+        List<WebElement> rows = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        assertEquals(4, rows.size(), "El listado debería mostrar 4 reservas para este usuario");
+
+        PO_LoginView.logout(driver);
+    }
+
+    @Test
+    @Order(35)
+    void PR35(){
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+
+        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
+        elements.get(0).click();
+
+        WebElement statusSelect = driver.findElement(By.id("status"));
+        statusSelect.click();
+
+        WebElement cancelledOption = driver.findElement(By.xpath("//*[@id=\"status\"]/option[3]"));
+        cancelledOption.click();
+
+        WebElement searchButton = driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button"));
+        searchButton.click();
+
+        List<WebElement> statusCells = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+
+        assertEquals(1, statusCells.size(), "Debería haber al menos una reserva cancelada");
+
+        for (WebElement cell : statusCells) {
+            String cellText = cell.getText().toUpperCase();
+            Assertions.assertTrue(cellText.contains("CANCELADA") || cellText.contains("CANCELLED"),
+                    "El estado de la reserva listada debería ser CANCELADA, pero fue: " + cellText);
+        }
+
+        PO_LoginView.logout(driver);
     }
 }

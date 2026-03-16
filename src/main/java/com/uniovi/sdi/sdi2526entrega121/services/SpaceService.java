@@ -1,7 +1,10 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
+import com.uniovi.sdi.sdi2526entrega121.entities.OccupiedSlot;
 import com.uniovi.sdi.sdi2526entrega121.entities.Space;
 import com.uniovi.sdi.sdi2526entrega121.entities.SpaceType;
+import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
+import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +27,13 @@ public class SpaceService {
     @Autowired
     private SpaceRepository spaceRepository;
 
+    private final BlockRepository blockRepository;
+    private final ReservationRepository reservationRepository;
+
+    public SpaceService(BlockRepository blockRepository, ReservationRepository reservationRepository) {
+        this.blockRepository = blockRepository;
+        this.reservationRepository = reservationRepository;
+    }
 
     public Page<Space> getSpaces(Pageable pageable) {
         return spaceRepository.findAll(pageable);
@@ -109,5 +122,39 @@ public class SpaceService {
         spaceRepository.save(space);
         log.info("Space toggled: id={}, active={}", id, space.isActive());
         return true;
+    }
+
+    //Obtiene las fechas ocupadas para un espacio para un rango de fechas
+    //tambien funciona como logiva para eviatr solapamientos (REQUISITO 14)
+    //      si la lista que devuelve esta vacia no hay solapamientos
+    //      si existe al menos un slot ocupado existe solapamiento
+    public List<OccupiedSlot> getAvailabilityForSpace(Long spaceId, LocalDateTime startDate,
+                                                      LocalDateTime endDate){
+        List<OccupiedSlot> occupiedSlots = new ArrayList<>();
+        //se añden los "choques" con reservas tras mapear las a OccupiedSlot
+        reservationRepository.findActiveReservationsInRange(spaceId, startDate, endDate)
+                .stream()
+                .map(r -> new OccupiedSlot("RESERVA", r.getStartDate(), r.getEndDate(), r.getReason()))
+                .forEach(occupiedSlots::add);
+
+        //se añden los "choques" con bloqueos tras mapear las a OccupiedSlot
+        blockRepository.findActiveBlocksInRange(spaceId, startDate, endDate)
+                .stream()
+                .map(b -> new OccupiedSlot("BLOQUEO", b.getStartDate(), b.getEndDate(), b.getReason()))
+                .forEach(occupiedSlots::add);
+        //se ordenan los "choques" cpor fecha de inicio
+        occupiedSlots.sort(Comparator.comparing(OccupiedSlot::getStartDate));
+
+        return occupiedSlots;
+    }
+
+    //sobrecarga de metodo que devuelve la lista sin paginacion
+    public List<Space> getActiveSpaces(){
+        return spaceRepository.findByActiveTrue();
+    }
+
+    public Space getSpace(Long id) {
+        return spaceRepository.findById(id).isPresent()
+                ? spaceRepository.findById(id).get() : new Space();
     }
 }

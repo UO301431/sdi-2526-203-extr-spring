@@ -9,16 +9,17 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ReservationRepository  extends CrudRepository<Reservation, Long>  {
 
     Page<Reservation> findAll(Pageable pageable);
 
     @Query("SELECT r FROM Reservation r WHERE " +
-            "(:status IS NULL OR r.status = :status) AND " +
-            "(cast(:spaceId as long) IS NULL OR r.space.id = :spaceId) AND " +
-            "(cast(:startDate as timestamp) IS NULL OR r.startDate >= :startDate) AND " +
-            "(cast(:endDate as timestamp) IS NULL OR r.endDate <= :endDate)")
+            "(?1 IS NULL OR r.status = ?1) AND " +
+            "(?2 IS NULL OR r.space.id = ?2) AND " +
+            "(?3 IS NULL OR r.startDate >= ?3) AND " +
+            "(?4 IS NULL OR r.endDate <= ?4)")
     Page<Reservation> findByFilters(@Param("status") ReservationStatus status,
                                     @Param("spaceId") Long spaceId,
                                     @Param("startDate") LocalDateTime startDate,
@@ -43,15 +44,26 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
                                      @Param("endDate") LocalDateTime endDate);
 
     @Query("SELECT r FROM Reservation r WHERE " +
-            "r.user.id = :userId AND " +
-            "(:status IS NULL OR r.status = :status) AND " +
-            "(:spaceId IS NULL OR r.space.id = :spaceId) AND " +
-            "(:startDate IS NULL OR r.startDate >= :startDate) AND " +
-            "(:endDate IS NULL OR r.endDate <= :endDate)")
+            "r.user.id = ?1 AND " +
+            "(?2 IS NULL OR r.status = ?2) AND " +
+            "(?3 IS NULL OR r.space.id = ?3) AND " +
+            "(?4 IS NULL OR r.startDate >= ?4) AND " +
+            "(?5 IS NULL OR r.endDate <= ?5)")
     Page<Reservation> findByUserAndFilters(@Param("userId") Long userId,
                                            @Param("status") ReservationStatus status,
                                            @Param("spaceId") Long spaceId,
                                            @Param("startDate") LocalDateTime startDate,
                                            @Param("endDate") LocalDateTime endDate,
                                            Pageable pageable);
+
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE r.space.id = :spaceId  " +
+            "AND r.status = 'ACTIVE'  " +
+            "AND r.startDate < :endDate  " +
+            "AND r.endDate > :startDate")
+    List<Reservation> findActiveReservationsInRange(
+            @Param("spaceId") Long spaceId,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }

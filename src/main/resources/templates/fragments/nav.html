@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
-    <a class="navbar-brand" href="/home">Reservas de Espacios</a>
+    <a class="navbar-brand" href="/home" th:text="#{navbar.brand}">Reservas de Espacios</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#myNavbar"
             aria-controls="navbarColor02" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -8,31 +8,28 @@
         <ul class="navbar-nav mr-auto">
 
             <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a class="nav-link" href="/home"><span>Inicio</span></a>
+                <a class="nav-link" href="/home"><span th:text="#{navbar.home}">Inicio</span></a>
             </li>
 
             <li class="nav-item" sec:authorize="hasRole('ROLE_EMPLOYEE')">
-                <a class="nav-link" href="/spaces/list">Espacios Disponibles</a>
+                <a class="nav-link" href="/spaces/list" th:text="#{navbar.availableSpaces}">Espacios Disponibles</a>
             </li>
-            <li class="nav-item" sec:authorize="hasRole('ROLE_EMPLOYEE')">
-                <a class="nav-link" href="/reservations/list">Mis Reservas</a>
+            <li class="nav-item" sec:authorize="isAuthenticated()">
+                <a class="nav-link" href="/reservations/list" th:text="#{navbar.reservations}">Reservas</a>
             </li>
 
             <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
                 <a class="nav-link dropdown-toggle" href="#" id="adminSpaces" role="button" data-toggle="dropdown"
-                   aria-haspopup="true" aria-expanded="false">Gestión de Espacios
+                   aria-haspopup="true" aria-expanded="false" th:text="#{navbar.spaceManagement}">Gestión de Espacios
                 </a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a class="dropdown-item" href="/spaces/list">Ver Espacios</a>
-                    <a class="dropdown-item" href="/spaces/new">Registrar Espacio</a>
+                    <a class="dropdown-item" href="/spaces/list" th:text="#{navbar.viewSpaces}">Ver Espacios</a>
+                    <a class="dropdown-item" href="/spaces/new" th:text="#{navbar.registerSpace}">Registrar Espacio</a>
                 </div>
-            </li>
-            <li class="nav-item" sec:authorize="hasRole('ROLE_ADMIN')">
-                <a class="nav-link" href="/admin/reservations/list">Listado Global de Reservas</a>
             </li>
 
             <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a class="nav-link" href="/profile/password">Cambiar Contraseña</a>
+                <a class="nav-link" href="/profile/password" th:text="#{navbar.changePassword}">Cambiar Contraseña</a>
             </li>
 
 
@@ -42,16 +39,16 @@
             <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="btnLanguage" role="button" data-toggle="dropdown"
                    aria-haspopup="true" aria-expanded="false">
-                    <span>Idioma</span>
+                    <span th:text="#{navbar.language}">Idioma</span>
                 </a>
                 <div id="languageDropdownMenuButton" class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" id="btnEnglish" value="en" href="?lang=en">
                         <img th:src="@{/images/if_uk_flag.png}" style="border: 0; float: left; margin-right: 15px; width: 20px;"/>
-                        <span>Inglés</span>
+                        <span th:text="#{navbar.english}">Inglés</span>
                     </a>
                     <a class="dropdown-item" id="btnSpanish" value="es" href="?lang=es">
                         <img th:src="@{/images/if_spain_flag.png}" style="border: 0; float: left; margin-right: 15px; width: 20px;"/>
-                        <span>Español</span>
+                        <span th:text="#{navbar.spanish}">Español</span>
                     </a>
                 </div>
             </li>
@@ -59,20 +56,20 @@
             <li sec:authorize="!isAuthenticated()" class="nav-item">
                 <a class="nav-link" href="/signup">
                     <i class='fas fa-user-alt' style='font-size:16px'></i>
-                    <span>Regístrate</span>
+                    <span th:text="#{navbar.signup}">Regístrate</span>
                 </a>
             </li>
             <li sec:authorize="!isAuthenticated()" class="nav-item">
                 <a class="nav-link" href="/login">
                     <i class='fas fa-sign-in-alt' style='font-size:16px'></i>
-                    <span>Iniciar sesión</span>
+                    <span th:text="#{navbar.login}">Iniciar sesión</span>
                 </a>
             </li>
 
             <li sec:authorize="isAuthenticated()" class="nav-item">
                 <a class="nav-link" href="/logout">
                     <i class='fas fa-sign-out-alt' style='font-size:16px'></i>
-                    <span>Desconectar</span>
+                    <span th:text="#{navbar.logout}">Desconectar</span>
                 </a>
             </li>
         </ul>

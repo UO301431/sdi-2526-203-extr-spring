@@ -43,8 +43,6 @@ public class SignUpFormValidator implements Validator {
         }
 
         //Las contraseñas coinciden
-        System.out.println(user.getPassword());
-        System.out.println(user.getPasswordConfirm());
         if(!user.getPassword().equals(user.getPasswordConfirm())) {
             errors.rejectValue("passwordConfirm", "Error.signup.passwordConfirm.coincidence");
         }
