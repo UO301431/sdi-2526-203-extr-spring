@@ -108,6 +108,8 @@
                     <th th:text="#{space.field.location}">Ubicación</th>
                     <th th:text="#{space.field.capacity}">Capacidad</th>
                     <th th:text="#{space.field.actions}">Acciones</th>
+                    <th>Disponibilidad</th>
+                    <!--th:text="#{space.field.availability}"-->
                 </tr>
                 </thead>
                 <tbody>
@@ -120,6 +122,13 @@
                         <a th:href="@{/spaces/detail/{id}(id=${space.id})}"
                            class="btn btn-sm btn-info"
                            th:text="#{space.action.detail}">Ver Detalle</a>
+                    </td>
+                    <td>
+                        <a th:href="${'space/availability/' + space.id}"
+                           class="btn btn-sm btn-info">
+                            Disponibilidad
+                        </a>
+                        <!--th:text="#{space.field.availability}"-->
                     </td>
                 </tr>
                 </tbody>
