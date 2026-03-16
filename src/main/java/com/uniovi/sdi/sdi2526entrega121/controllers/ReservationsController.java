@@ -162,8 +162,9 @@ public class ReservationsController {
     @PostMapping("/reservations/add")
     public String setReservation(@ModelAttribute Reservation reservation,
                                  Principal principal,
-                                 BindingResult result){
-
+                                 BindingResult result,
+                                 Model model){
+        model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
         String dni = principal.getName();
         User user = usersService.getUserByDni(dni);
         reservation.setUser(user);

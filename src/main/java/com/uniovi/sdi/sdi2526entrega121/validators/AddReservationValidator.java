@@ -1,15 +1,22 @@
 package com.uniovi.sdi.sdi2526entrega121.validators;
 
+import com.uniovi.sdi.sdi2526entrega121.entities.OccupiedSlot;
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
+import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class AddReservationValidator implements Validator {
+    private final SpaceService spaceService;
 
+    public AddReservationValidator(SpaceService spaceService) {
+        this.spaceService = spaceService;
+    }
 
     @Override
     public boolean supports(Class<?> aClass) {
@@ -31,6 +38,13 @@ public class AddReservationValidator implements Validator {
             errors.rejectValue("startDate", "Error.date.startDateAfterToday");
         }
 
-
+        //validar solapamientos
+        List<OccupiedSlot> occupiedSlots = spaceService.getAvailabilityForSpace(
+                reservation.getSpace().getId(),
+                reservation.getStartDate(),
+                reservation.getEndDate());
+        if(!occupiedSlots.isEmpty()){
+            errors.rejectValue("startDate", "Error.date.invalidate");
+        }
     }
 }

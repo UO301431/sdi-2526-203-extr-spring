@@ -776,14 +776,44 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(32)
     void PR32(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/add");
+
+        //rellenar datos reserva valida
+        driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
+        driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
+
+        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+
+
+        //Se realiza una reserva en el mismo horario
+        driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
+        driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
+
+        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+
+        String checkText = "La reserva nos e puede realizar por un solapamiento";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     //Intentar reservar dentro de un bloqueo (debe fallar).
     @Test
     @Order(33)
     void PR33(){
-        //TODO
+        //LocalDateTime.of(2027, 4, 10, 8, 0),
+        //LocalDateTime.of(2027, 4, 10, 18, 0),
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/reservations/add");
+
+        driver.findElement(By.id("startDate")).sendKeys("10-04-2029T13:00");
+        driver.findElement(By.id("endDate")).sendKeys("10-04-2029T15:00");
+
+        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+
+        String checkText = "La reserva nos e puede realizar por un solapamiento";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     @Test
