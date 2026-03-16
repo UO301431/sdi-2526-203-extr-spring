@@ -101,16 +101,15 @@ public class SpaceController {
         if (!isAdmin()) return "redirect:/spaces/list";
         String error = spaceService.addSpace(space);
         if (error != null) {
-            //No esta internacionalizado
-            //TODO cambiar cuando este internacionalizado
-            //model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
-            model.addAttribute("error", error);
+
+            model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
+
             model.addAttribute("space", space);
             model.addAttribute("spaceTypes", SpaceType.values());
             return "space/form";
         }
-        /*redirectAttrs.addFlashAttribute("successMessage",
-                messageSource.getMessage("space.success.created", null, locale));*/
+        redirectAttrs.addFlashAttribute("successMessage",
+                messageSource.getMessage("space.success.created", null, locale));
         return "redirect:/spaces/list";
     }
 
@@ -135,18 +134,17 @@ public class SpaceController {
         if (!isAdmin()) return "redirect:/spaces/list";
         String error = spaceService.editSpace(id, space);
         if (error != null) {
-            //No esta internacionalizado
-            //TODO cambiar cuando este internacionalizado
-            //model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
-            model.addAttribute("error", error);
+
+            model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
+
             space.setId(id);
             model.addAttribute("space", space);
             model.addAttribute("spaceTypes", SpaceType.values());
             return "space/edit";
         }
-        //TODO cambiar cuando este internacionalizado
-        /*redirectAttrs.addFlashAttribute("successMessage",
-                messageSource.getMessage("space.success.edited", null, locale));*/
+
+        redirectAttrs.addFlashAttribute("successMessage",
+                messageSource.getMessage("space.success.edited", null, locale));
         return "redirect:/spaces/list";
     }
 

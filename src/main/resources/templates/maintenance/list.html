@@ -10,12 +10,12 @@
     <span th:text="#{block.list.title}">Bloqueos de Mantenimiento</span>
     <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
   </h2>
-  <!--TODO cambiar por success mesage-->
-  <!--<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>-->
-  <!--TODO cambiar por error mesage-->
-  <!--<div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>-->
 
-  <div th:if="${error}"   class="alert alert-danger"  th:text="${error}"></div>
+  <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+
+  <div th:if="${errorMessage}"   class="alert alert-danger"  th:text="${errorMessage}"></div>
+
+
 
   <a th:href="@{/blocks/new/{id}(id=${spaceId})}"
      class="btn btn-success mb-3"
