@@ -742,7 +742,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2028T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         //se va a la lista de reservas
         driver.navigate().to(URL + "/reservations/list");
@@ -764,7 +764,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2028T18:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2028T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La fecha de inicio debe ser anterior a la de fin";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -783,14 +783,14 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
 
         //Se realiza una reserva en el mismo horario
         driver.findElement(By.id("startDate")).sendKeys("12-01-2029T14:00");
         driver.findElement(By.id("endDate")).sendKeys("12-01-2029T16:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La reserva nos e puede realizar por un solapamiento";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -809,7 +809,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("startDate")).sendKeys("10-04-2029T13:00");
         driver.findElement(By.id("endDate")).sendKeys("10-04-2029T15:00");
 
-        driver.findElement(By.xpath("/html/body/div/form/div[2]/div/button")).click();
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
         String checkText = "La reserva nos e puede realizar por un solapamiento";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
