@@ -21,14 +21,12 @@ import static org.junit.jupiter.api.Assertions.*;
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    //static String Geckodriver = "C:\\geckodriver.exe";
 
-    static WebDriver driver = getDriver(PathFirefox/*, Geckodriver*/);
+    static WebDriver driver = getDriver(PathFirefox);
     static String URL = "http://localhost:8090";
 
-    public static WebDriver getDriver(String PathFirefox/*, String Geckodriver*/) {
+    public static WebDriver getDriver(String PathFirefox) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
-        //System.setProperty("webdriver.gecko.driver", Geckodriver);
         driver = new FirefoxDriver();
         return driver;
     }
@@ -49,16 +47,35 @@ class Sdi2526Entrega121ApplicationTests {
     @AfterAll
     static public void end() {
         if(driver != null) {
-        driver.quit();
+            driver.quit();
         }
     }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private void loginAsAdmin() {
+        driver.navigate().to(URL + "/login");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+    }
+
+    private void loginAsUser() {
+        driver.navigate().to(URL + "/login");
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
+    }
+
+    private String bodyText() {
+        return driver.findElement(By.tagName("body")).getText();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // TESTS 1–9 (sin cambios)
+    // ─────────────────────────────────────────────────────────────────────────
 
     @Test
     @Order(1)
     void PRO1(){
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678K","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
-
         String checkText = "";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
@@ -69,14 +86,11 @@ class Sdi2526Entrega121ApplicationTests {
     void PR02(){
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@");
-
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.passwordConfirm.coincidence",
                 PO_Properties.getSPANISH());
-
         String checkText = PO_HomeView.getP().getString("Error.signup.passwordConfirm.coincidence",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
-
     }
 
     @Test
@@ -86,36 +100,30 @@ class Sdi2526Entrega121ApplicationTests {
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
-
         String checkText = PO_HomeView.getP().getString("Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
-
     }
 
     @Test
     @Order(4)
-    void PR04A(){ //Sin simbolos especiales
+    void PR04A(){
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
-
         String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
-
-
     }
 
     @Test
     @Order(5)
-    void PR04B(){ //Sin numeros
+    void PR04B(){
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
-
         String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
@@ -150,6 +158,7 @@ class Sdi2526Entrega121ApplicationTests {
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
+
     @Test
     @Order(9)
     void PR08() {
@@ -158,29 +167,6 @@ class Sdi2526Entrega121ApplicationTests {
         String checkText = "";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
-    private void loginAsAdmin() {
-        driver.navigate().to(URL + "/login");
-        driver.findElement(By.id("username")).sendKeys("12345678Z");
-        driver.findElement(By.id("password")).sendKeys("@Dm1n1str@D0r");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
-    }
-
-    private String bodyText() {
-        return driver.findElement(By.tagName("body")).getText();
-    }
-
-    private void comprobarPaginacion() {
-        // Busca el enlace a la página 2 y hace clic si existe
-        List<WebElement> page2 = driver.findElements(By.xpath("//a[contains(@href, 'page=2')]"));
-        if (!page2.isEmpty()) {
-            page2.get(0).click();
-            assertTrue(driver.getCurrentUrl().contains("page="), "La URL debe mantener la paginación");
-        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -194,6 +180,7 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/new");
 
+        // Rellenar el formulario
         driver.findElement(By.id("name")).sendKeys("SalaSelenium01");
         new Select(driver.findElement(By.id("type"))).selectByValue("SALA");
         driver.findElement(By.id("location")).sendKeys("Planta 2 Test");
@@ -201,12 +188,10 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).sendKeys("8");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        System.out.println("URL actual: " + driver.getCurrentUrl());
-        System.out.println("Cuerpo: " + bodyText());
-
+        // Comprobar que redirige al listado o muestra el espacio creado
         assertTrue(
                 driver.getCurrentUrl().contains("/spaces/list")
-                        || bodyText().contains("SalaSelenium01"),
+                        || !PO_View.checkElementBy(driver, "text", "SalaSelenium01").isEmpty(),
                 "Tras crear un espacio válido debe redirigir al listado o mostrar el espacio"
         );
     }
@@ -223,16 +208,14 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).clear();
         driver.findElement(By.id("capacity")).sendKeys("5");
 
+        // Eliminar 'required' para poder enviar el formulario sin nombre
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('name').removeAttribute('required');"
         );
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                driver.getCurrentUrl().contains("/spaces/new")
-                        || bodyText().contains("nombre") || bodyText().contains("name"),
-                "Nombre vacío debe mostrar error y permanecer en el formulario"
-        );
+        // Comprobar que aparece el mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "space.error.name.empty", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
@@ -249,27 +232,25 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).clear();
         driver.findElement(By.id("capacity")).sendKeys("0");
 
+        // Eliminar min=1 para que el navegador no bloquee el envío
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('capacity').removeAttribute('min');"
         );
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                driver.getCurrentUrl().contains("/spaces/new")
-                        || bodyText().contains("capacidad") || bodyText().contains("capacity"),
-                "Capacidad < 1 debe mostrar error y permanecer en el formulario"
-        );
+        // Comprobar que aparece el mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "space.error.capacity.invalid", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
-    // [Prueba 14] Registrar espacio con el mismo nombre que otro espacio activo (debe fallar)
+    // [Prueba 14] Registrar espacio con nombre duplicado (debe fallar)
     @Test
     @Order(14)
     public void prueba14_registrarEspacioNombreDuplicado() {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/new");
 
-        // "Sala A" debe existir en los datos semilla como espacio activo
+        // "Sala Ada Lovelace" existe en los datos semilla como espacio activo
         driver.findElement(By.id("name")).sendKeys("Sala Ada Lovelace");
         new Select(driver.findElement(By.id("type"))).selectByValue("SALA");
         driver.findElement(By.id("location")).sendKeys("Planta 1 - Edificio A");
@@ -277,11 +258,8 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("capacity")).sendKeys("10");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                bodyText().contains("nombre") || bodyText().contains("existe")
-                        || bodyText().contains("duplicado"),
-                "Nombre duplicado de espacio activo debe mostrar error"
-        );
+        // Comprobar que aparece el mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "space.error.name.duplicate", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
@@ -296,18 +274,18 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        driver.findElement(By.cssSelector("a[href*='/spaces/edit/']")).click();
+        // Clicar el primer enlace de editar
+        PO_PrivateView.findAndClick(driver, "@href", "/spaces/edit/", 0);
 
         WebElement location = driver.findElement(By.id("location"));
         location.clear();
         location.sendKeys("Ubicación editada Selenium");
-
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
+        // Comprobar que redirige al listado
         assertTrue(
-                driver.getCurrentUrl().contains("/spaces/list")
-                        || bodyText().contains("correctamente"),
-                "Edición válida debe redirigir al listado o mostrar mensaje de éxito"
+                driver.getCurrentUrl().contains("/spaces/list"),
+                "Edición válida debe redirigir al listado"
         );
     }
 
@@ -318,7 +296,8 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        driver.findElement(By.cssSelector("a[href*='/spaces/edit/']")).click();
+        // Clicar el primer enlace de editar
+        PO_PrivateView.findAndClick(driver, "@href", "/spaces/edit/", 0);
 
         WebElement capacity = driver.findElement(By.id("capacity"));
         capacity.clear();
@@ -329,10 +308,8 @@ class Sdi2526Entrega121ApplicationTests {
         );
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                bodyText().contains("capacidad") || bodyText().contains("capacity"),
-                "Capacidad < 1 en edición debe mostrar error"
-        );
+        // Comprobar que aparece el mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "space.error.capacity.invalid", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
@@ -347,6 +324,7 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
+        // Localizar el primer botón "Desactivar" y el nombre del espacio en su fila
         WebElement deactivateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-warning')]"
         ));
@@ -359,6 +337,7 @@ class Sdi2526Entrega121ApplicationTests {
         // Esperar a que AJAX reemplace el fragmento
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
+        // Verificar que el botón cambió a verde (estado: inactivo → botón Activar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
@@ -367,12 +346,9 @@ class Sdi2526Entrega121ApplicationTests {
                 "Tras desactivar, el botón debe cambiar a verde (Activar)"
         );
 
-        // Verificar que el espacio ya no aparece en el listado de usuario
+        // Verificar que el espacio no aparece en el listado de usuario estándar
         driver.manage().deleteAllCookies();
-        driver.navigate().to(URL + "/login");
-        driver.findElement(By.id("username")).sendKeys("10000001S");
-        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        loginAsUser();
         driver.navigate().to(URL + "/spaces/list");
         assertFalse(
                 bodyText().contains(spaceName),
@@ -387,6 +363,7 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
+        // Localizar el primer botón "Activar" y el nombre del espacio en su fila
         WebElement activateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-success')]"
         ));
@@ -399,7 +376,7 @@ class Sdi2526Entrega121ApplicationTests {
         // Esperar a que AJAX reemplace el fragmento
         try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
-        // Verificar que el badge del espacio cambió a Activo en la misma página
+        // Verificar que el botón cambió a amarillo (estado: activo → botón Desactivar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
@@ -408,12 +385,9 @@ class Sdi2526Entrega121ApplicationTests {
                 "Tras activar, el botón debe cambiar a amarillo (Desactivar)"
         );
 
-        // Verificar que el espacio ahora sí aparece en el listado de usuario
+        // Verificar que el espacio sí aparece en el listado de usuario estándar
         driver.manage().deleteAllCookies();
-        driver.navigate().to(URL + "/login");
-        driver.findElement(By.id("username")).sendKeys("10000001S");
-        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        loginAsUser();
         driver.navigate().to(URL + "/spaces/list");
         assertTrue(
                 bodyText().contains(spaceName),
@@ -432,6 +406,7 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
+        // Obtener el id del primer espacio desde el enlace de bloqueos
         WebElement blocksLink = driver.findElement(
                 By.cssSelector("a[href*='/blocks/list/']")
         );
@@ -440,23 +415,23 @@ class Sdi2526Entrega121ApplicationTests {
 
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
 
-        driver.findElement(By.id("startDate")).sendKeys("2099-06-01T09:00");
-        driver.findElement(By.id("endDate")).sendKeys("2099-06-01T18:00");
+        // Fechas lejanas para evitar colisión con datos semilla
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2099-06-01T09:00';"
+        );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2099-06-01T18:00';"
+        );
         driver.findElement(By.id("reason")).sendKeys("Mantenimiento Selenium válido");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        System.out.println("URL: " + driver.getCurrentUrl());
-
+        // Comprobar que redirige al listado de bloqueos o muestra mensaje de éxito
         assertTrue(
-                driver.getCurrentUrl().contains("/blocks/list/")
-                        || bodyText().contains("correctamente"),
-                "Bloqueo válido debe guardarse y redirigir al listado de bloqueos"
+                driver.getCurrentUrl().contains("/blocks/list/"),
+                "Bloqueo válido debe redirigir al listado de bloqueos"
         );
-        assertTrue(
-                bodyText().contains("Mantenimiento Selenium válido")
-                        || bodyText().contains("correctamente"),
-                "El motivo del bloqueo o mensaje de éxito debe aparecer"
-        );
+        // Comprobar que el motivo aparece en el listado
+        PO_View.checkElementBy(driver, "text", "Mantenimiento Selenium válido");
     }
 
     // [Prueba 20] Crear un bloqueo solapado con otro bloqueo activo (debe fallar)
@@ -472,7 +447,7 @@ class Sdi2526Entrega121ApplicationTests {
         String spaceId = blocksLink.getAttribute("href")
                 .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-        // Paso 1: crea su propio bloqueo base
+        // Paso 1: crear bloqueo base independiente de la prueba 19
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2099-07-01T09:00';"
@@ -483,7 +458,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("reason")).sendKeys("Bloqueo base prueba 20");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        // Paso 2: intenta crear un bloqueo solapado
+        // Paso 2: intentar crear bloqueo solapado con el anterior
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2099-07-01T10:00';"
@@ -494,21 +469,19 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("reason")).sendKeys("Bloqueo solapado");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                bodyText().contains("solapa") || bodyText().contains("overlap")
-                        || bodyText().contains("bloqueo") || bodyText().contains("block.error"),
-                "Bloqueo solapado con otro activo debe mostrar error"
-        );
+        // Comprobar mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "block.error.overlap.block", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
+    // [Prueba 21] Crear un bloqueo solapado con una reserva activa (debe fallar)
     @Test
     @Order(21)
     public void prueba21_crearBloqueoSolapadoConReserva() {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        // Busca el enlace de bloqueos de "Sala Ada Lovelace" (space1, donde está la reserva semilla)
+        // Buscar bloqueos de "Sala Ada Lovelace" — donde está la reserva semilla fija
         WebElement blocksLink = driver.findElement(
                 By.xpath("//tr[td[1][normalize-space()='Sala Ada Lovelace']]//a[contains(@href,'/blocks/list/')]")
         );
@@ -517,7 +490,7 @@ class Sdi2526Entrega121ApplicationTests {
 
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
 
-        // Usar JavaScript para setear las fechas — sendKeys no funciona bien en Firefox
+        // Fechas que solapan con la reserva semilla fija (2099-09-15 09:00–18:00)
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2099-09-15T10:00';"
         );
@@ -527,11 +500,8 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("reason")).sendKeys("Bloqueo sobre reserva");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        assertTrue(
-                bodyText().contains("reserva") || bodyText().contains("reservation")
-                        || bodyText().contains("solapa"),
-                "Bloqueo solapado con reserva activa debe mostrar error"
-        );
+        // Comprobar mensaje de error por clave i18n
+        PO_View.checkElementByKey(driver, "block.error.overlap.reservation", PO_Properties.getSPANISH());
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
@@ -552,46 +522,40 @@ class Sdi2526Entrega121ApplicationTests {
         String spaceId = blocksLink.getAttribute("href")
                 .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-        // Primero crea un bloqueo para asegurar que hay uno activo que cancelar
+        // Crear un bloqueo propio para asegurar que hay uno activo que cancelar
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
-        driver.findElement(By.id("startDate")).sendKeys("2099-08-01T09:00");
-        driver.findElement(By.id("endDate")).sendKeys("2099-08-01T18:00");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2099-08-01T09:00';"
+        );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2099-08-01T18:00';"
+        );
         driver.findElement(By.id("reason")).sendKeys("Bloqueo a cancelar prueba 22");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        // Pulsa el primer botón de cancelar bloqueo activo
-        WebElement cancelBtn = driver.findElement(By.xpath(
-                "//form[contains(@action,'/blocks/cancel/')]//button[@type='submit']"
-        ));
-        cancelBtn.click();
+        // Pulsar el primer botón de cancelar un bloqueo activo
+        PO_PrivateView.findAndClick(driver, "free",
+                "//form[contains(@action,'/blocks/cancel/')]//button[@type='submit']", 0);
 
-        // El bloqueo debe aparecer como CANCELADO en el listado
-        assertTrue(
-                bodyText().contains("CANCELADO") || bodyText().contains("CANCELLED"),
-                "El bloqueo cancelado debe mostrarse con estado CANCELADO"
-        );
+        // Comprobar mensaje de éxito por clave i18n
+        PO_View.checkElementByKey(driver, "block.success.cancelled", PO_Properties.getSPANISH());
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // TESTS 23–35 (sin cambios)
+    // ─────────────────────────────────────────────────────────────────────────
 
     @Test
     @Order(23)
     void PR23(){
-
-
-        // TODO falta por corregir y terminar
-
-
         PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
-
         driver.navigate().to(URL + "/reservations/list");
-
         PO_View.checkElementBy(driver, "text", "Estado");
         PO_View.checkElementBy(driver, "text", "Usuario");
         PO_View.checkElementBy(driver, "text", "Inicio");
         PO_View.checkElementBy(driver, "text", "Espacio");
         PO_View.checkElementBy(driver, "text", "Fin");
-
         PO_PrivateView.checkPagination(driver);
-
         List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
         int numeroDeFilas = filas.size();
         assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
@@ -601,25 +565,13 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(24)
     void PR24(){
-
-
-        // TODO falta por corregir y terminar
-
-
         PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
-
         driver.navigate().to(URL + "/reservations/list");
-
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
-
         driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-
         assertTrue(driver.getCurrentUrl().contains("spaceId="), "La URL debe contener el filtro por espacio");
-
         PO_PrivateView.checkPagination(driver);
-
         assertTrue(driver.getCurrentUrl().contains("spaceId="), "El filtro de espacio debe mantenerse al cambiar de página");
-
         List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
         int numeroDeFilas = filas.size();
         assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
@@ -629,28 +581,16 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(25)
     void PR25(){
-
-
-        // TODO falta por corregir y terminar
-
-
         PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
-
         driver.navigate().to(URL + "/reservations/list");
-
         driver.findElement(By.id("startDate")).sendKeys("2026-03-14");
         driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
-
         PO_PrivateView.findAndClick(driver, "free",
                 "//form[@action='/reservations/list']//button[@type='submit']", 0);
-
         try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
-
         assertTrue(driver.getCurrentUrl().contains("startDate="), "La URL debe contener la fecha de inicio");
         assertTrue(driver.getCurrentUrl().contains("endDate="), "La URL debe contener la fecha de fin");
-
         PO_PrivateView.checkPagination(driver);
-
         assertTrue(driver.getCurrentUrl().contains("startDate="), "El filtro de fecha debe mantenerse al cambiar de página");
     }
 
