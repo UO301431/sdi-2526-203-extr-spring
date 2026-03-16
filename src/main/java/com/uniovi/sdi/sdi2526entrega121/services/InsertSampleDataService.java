@@ -183,9 +183,17 @@ public class InsertSampleDataService {
                 "Reservado para evento educativo",
                 BlockStatus.ACTIVE);
 
+        // Bloqueo para prueba
+        Block block_space1_test_33 = new Block(space1,
+                LocalDateTime.of(2029, 4, 10, 8, 0),
+                LocalDateTime.of(2029, 4, 10, 18, 0),
+                "Mantenimiento de instalaciones",
+                BlockStatus.ACTIVE);
+
         // Guardar todas los bloqueos
         blockRepository.save(block_space5_1);
         blockRepository.save(block_space5_2);
         blockRepository.save(block_space5_3);
+        blockRepository.save(block_space1_test_33);
     }
 }
