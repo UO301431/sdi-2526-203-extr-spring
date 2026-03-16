@@ -658,22 +658,59 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(26)
         //Consultar el listado de espacios disponibles
     void PR26(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/spaces/list");
+
+        String checkText = "Sala Ada Lovelace";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
     }
 
     //Se aplica el filtro de capacidad con el valor 10
     @Test
     @Order(27)
     void PR27(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/spaces/list");
+
+        driver.findElement(By.id("minCapacity")).sendKeys("10");
+        String checkText = "Sala Ada Lovelace";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        checkText = "Laboratorio Alan Turing";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        checkText = "Auditorio Grace Hopper";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     //Se accede a los detalles del primer espacio
     @Test
     @Order(28)
     void PR28(){
-        //TODO
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        driver.navigate().to(URL + "/spaces/list");
+
+        driver.findElement(By.xpath("/html/body/div/div/div[1]/table/tbody/tr[1]/td[5]/a")).click();
+        //btn btn-sm btn-info
+
+        String checkText = "Sala Ada Lovelace";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        checkText = "SALA";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        checkText = "Planta 1 - Edificio A";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
+
 
     //Se consulta la disponibilidad de un espacio
     @Test
