@@ -10,10 +10,10 @@
         <span th:text="#{block.form.title}">Nuevo Bloqueo de Mantenimiento</span>
         <span th:if="${space}" th:text="' – ' + ${space.name}"></span>
     </h2>
-    <!-- TODO cambiar por error message-->
-    <!--<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>-->
 
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+
 
     <form th:action="@{/blocks/new/{id}(id=${spaceId})}" method="post">
 

@@ -76,9 +76,9 @@ public class SpaceService {
                 space.getName().trim(), -1L
         );
         if (!existing.isEmpty()) {
-            //TODO cambiar cuando este internacionalizado
-            //return "space.error.name.duplicate";
-            return "duplicado";
+
+            return "space.error.name.duplicate";
+
         }
 
         spaceRepository.save(space);
@@ -95,9 +95,9 @@ public class SpaceService {
             return "space.error.name.empty";
         }
         if (updated.getCapacity() < 1) {
-            //TODO cambiar cuando este internacionalizado
-            //return "space.error.capacity.invalid";
-            return "capacidad";
+
+            return "space.error.capacity.invalid";
+
         }
         if (spaceRepository.findActiveByNameExcluding(updated.getName().trim(), id).isPresent()) {
             return "space.error.name.duplicate";

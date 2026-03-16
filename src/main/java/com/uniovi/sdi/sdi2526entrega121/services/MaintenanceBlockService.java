@@ -74,18 +74,18 @@ public class MaintenanceBlockService {
         List<MaintenanceBlock> blockOverlaps =
                 blockRepository.findOverlappingActiveBlocks(spaceId, start, end, null);
         if (!blockOverlaps.isEmpty()) {
-            //TODO cambiar cuando este internacionalizado
-            //return "block.error.overlap.block";
-            return "bloqueo";
+
+            return "block.error.overlap.block";
+
         }
 
         // Check overlap with active reservations
         boolean reservationOverlap = reservationRepository
                 .existsActiveOverlap(spaceId, start, end, ReservationStatus.ACTIVE);
         if (reservationOverlap) {
-            //TODO cambiar cuando este internacionalizado
-            //return "block.error.overlap.reservation";
-            return "reserva";
+
+            return "block.error.overlap.reservation";
+            
         }
 
         MaintenanceBlock block = new MaintenanceBlock(spaceOpt.get(), start, end, reason.trim());
