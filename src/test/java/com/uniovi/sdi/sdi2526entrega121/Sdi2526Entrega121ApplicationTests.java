@@ -53,112 +53,7 @@ class Sdi2526Entrega121ApplicationTests {
         }
     }
 
-    @Test
-    @Order(1)
-    void PRO1(){
-        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678K","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
 
-        String checkText = "";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-
-    @Test
-    @Order(2)
-    void PR02(){
-        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@");
-
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.passwordConfirm.coincidence",
-                PO_Properties.getSPANISH());
-
-        String checkText = PO_HomeView.getP().getString("Error.signup.passwordConfirm.coincidence",
-                PO_Properties.getSPANISH());
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-
-    }
-
-    @Test
-    @Order(3)
-    void PR03(){
-        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
-                PO_Properties.getSPANISH());
-
-        String checkText = PO_HomeView.getP().getString("Error.signup.dni.duplicate",
-                PO_Properties.getSPANISH());
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-
-    }
-
-    @Test
-    @Order(4)
-    void PR04A(){ //Sin simbolos especiales
-        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
-                PO_Properties.getSPANISH());
-
-        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
-                PO_Properties.getSPANISH());
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-
-
-    }
-
-    @Test
-    @Order(5)
-    void PR04B(){ //Sin numeros
-        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
-                PO_Properties.getSPANISH());
-
-        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
-                PO_Properties.getSPANISH());
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-
-    @Test
-    @Order(6)
-    void PR05() {
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
-        String checkText = "";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-
-    @Test
-    @Order(7)
-    void PR06() {
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678K", "@Dm1n1str@D0r");
-        String checkText = "";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-
-    @Test
-    @Order(8)
-    void PR07() {
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "123", "@Dm1n1str@D0r");
-        String checkText = "";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
-    @Test
-    @Order(9)
-    void PR08() {
-        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n");
-        String checkText = "";
-        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-    }
 
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -181,6 +76,153 @@ class Sdi2526Entrega121ApplicationTests {
             page2.get(0).click();
             assertTrue(driver.getCurrentUrl().contains("page="), "La URL debe mantener la paginación");
         }
+    }
+
+
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // TAREA 1&2&3 – Signup & login & salir de sesion
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @Test
+    @Order(1)
+    void PRO1(){
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678B","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
+
+        String checkText = "Identíficate";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(2)
+    void PR02(){
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@");
+
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.passwordConfirm.coincidence",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.passwordConfirm.coincidence",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+    }
+
+    @Test
+    @Order(3)
+    void PR03(){
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.dni.duplicate",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+    }
+
+    @Test
+    @Order(4)
+    void PR04A(){ //Sin simbolos especiales
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678T","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+
+    }
+
+    @Test
+    @Order(5)
+    void PR04B(){ //Sin numeros
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
+        PO_SignUpView.fillForm(driver, "12345678L","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+
+        String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
+                PO_Properties.getSPANISH());
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(6)
+    void PR05() {
+        driver.navigate().to(URL + "/signup");
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+        String checkText = "Gestión de Espacios";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(7)
+    void PR06() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+        String checkText = "Listado Global de Reservas";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(8)
+    void PR07() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "123", "@Dm1n1str@D0r");
+        String checkText = "DNI o contraseña incorrectos.";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+    @Test
+    @Order(9)
+    void PR08() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n");
+        String checkText = "DNI o contraseña incorrectos.";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(10)
+    void PR09() {
+        // Administrador
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        String checkText = "Identíficate";
+        PO_View.checkElementBy(driver, "text", checkText);
+    }
+
+    @Test
+    @Order(10)
+    void PR10() {
+        // Administrador
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        String checkText = "Identíficate";
+        PO_View.checkElementBy(driver, "text", checkText);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
