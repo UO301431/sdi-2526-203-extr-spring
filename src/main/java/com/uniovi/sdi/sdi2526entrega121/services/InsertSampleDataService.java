@@ -140,6 +140,13 @@ public class InsertSampleDataService {
                 LocalDateTime.of(2027, 5, 15, 14, 0),
                 "Revisión de código");
 
+
+        Reservation resTest21 = new Reservation(users.get(1), space1,
+                LocalDateTime.of(2099, 9, 15, 9, 0),
+                LocalDateTime.of(2099, 9, 15, 18, 0),
+                "Reserva fija para test de solapamiento");
+        reservationRepository.save(resTest21);
+
         // Guardar todas las reservas
         reservationRepository.save(res1);
         reservationRepository.save(res2);

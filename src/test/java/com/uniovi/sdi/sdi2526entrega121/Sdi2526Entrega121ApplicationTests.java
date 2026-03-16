@@ -14,10 +14,6 @@ import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -25,14 +21,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
-    static String Geckodriver = "C:\\geckodriver.exe";
+    //static String Geckodriver = "C:\\geckodriver.exe";
 
-    static WebDriver driver = getDriver(PathFirefox, Geckodriver);
+    static WebDriver driver = getDriver(PathFirefox/*, Geckodriver*/);
     static String URL = "http://localhost:8090";
 
-    public static WebDriver getDriver(String PathFirefox, String Geckodriver) {
+    public static WebDriver getDriver(String PathFirefox/*, String Geckodriver*/) {
         System.setProperty("webdriver.firefox.bin", PathFirefox);
-        System.setProperty("webdriver.gecko.driver", Geckodriver);
+        //System.setProperty("webdriver.gecko.driver", Geckodriver);
         driver = new FirefoxDriver();
         return driver;
     }
@@ -506,25 +502,28 @@ class Sdi2526Entrega121ApplicationTests {
         assertFalse(bodyText().toLowerCase().contains("correctamente"));
     }
 
-    // [Prueba 21] Crear un bloqueo solapado con una reserva activa (debe fallar)
-    // IMPORTANTE: ajusta las fechas para que coincidan con una reserva semilla activa
     @Test
     @Order(21)
     public void prueba21_crearBloqueoSolapadoConReserva() {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
+        // Busca el enlace de bloqueos de "Sala Ada Lovelace" (space1, donde está la reserva semilla)
         WebElement blocksLink = driver.findElement(
-                By.cssSelector("a[href*='/blocks/list/']")
+                By.xpath("//tr[td[1][normalize-space()='Sala Ada Lovelace']]//a[contains(@href,'/blocks/list/')]")
         );
         String spaceId = blocksLink.getAttribute("href")
                 .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
 
-        // Ajusta estas fechas para que caigan dentro de una reserva activa de tus datos semilla
-        driver.findElement(By.id("startDate")).sendKeys("2026-05-01T08:00");
-        driver.findElement(By.id("endDate")).sendKeys("2026-05-01T20:00");
+        // Usar JavaScript para setear las fechas — sendKeys no funciona bien en Firefox
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2099-09-15T10:00';"
+        );
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2099-09-15T17:00';"
+        );
         driver.findElement(By.id("reason")).sendKeys("Bloqueo sobre reserva");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
