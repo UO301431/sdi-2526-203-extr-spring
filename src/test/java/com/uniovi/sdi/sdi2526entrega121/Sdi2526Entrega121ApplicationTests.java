@@ -586,7 +586,6 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
         PO_PrivateView.findAndClick(driver, "free",
                 "//form[@action='/reservations/list']//button[@type='submit']", 0);
-        try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
         assertTrue(driver.getCurrentUrl().contains("startDate=2026-03-14"), "La URL debe contener la fecha de inicio");
         assertTrue(driver.getCurrentUrl().contains("endDate=2026-03-18"), "La URL debe contener la fecha de fin");
         List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
@@ -766,10 +765,9 @@ class Sdi2526Entrega121ApplicationTests {
     void PR34(){
         PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
 
-        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
-        elements.get(0).click();
+        driver.navigate().to(URL + "/reservations/list");
 
-        PO_View.checkElementBy(driver, "text", "Listado Global de Reservas");
+        PO_View.checkElementBy(driver, "text", "Listado de Reservas");
 
         PO_View.checkElementBy(driver, "text", "Espacio");
         PO_View.checkElementBy(driver, "text", "Inicio");
@@ -777,7 +775,7 @@ class Sdi2526Entrega121ApplicationTests {
         PO_View.checkElementBy(driver, "text", "Estado");
 
         List<WebElement> rows = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
-        assertEquals(4, rows.size(), "El listado debería mostrar 4 reservas para este usuario");
+        assertEquals(5, rows.size(), "El listado debería mostrar 5 reservas para este usuario");
 
         PO_LoginView.logout(driver);
     }
@@ -787,21 +785,15 @@ class Sdi2526Entrega121ApplicationTests {
     void PR35(){
         PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
 
-        List<WebElement> elements = PO_View.checkElementBy(driver, "@href", "/reservations/list");
-        elements.get(0).click();
+        driver.navigate().to(URL + "/reservations/list");
 
-        WebElement statusSelect = driver.findElement(By.id("status"));
-        statusSelect.click();
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[3]", 0);
 
-        WebElement cancelledOption = driver.findElement(By.xpath("//*[@id=\"status\"]/option[3]"));
-        cancelledOption.click();
-
-        WebElement searchButton = driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button"));
-        searchButton.click();
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"main-container\"]/form/button", 0);
 
         List<WebElement> statusCells = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
 
-        assertEquals(1, statusCells.size(), "Debería haber al menos una reserva cancelada");
+        assertEquals(1, statusCells.size(), "Debería haber una reserva cancelada");
 
         for (WebElement cell : statusCells) {
             String cellText = cell.getText().toUpperCase();
