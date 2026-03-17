@@ -12,12 +12,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -967,6 +970,7 @@ class Sdi2526Entrega121ApplicationTests {
      * [Prueba 41] Intento de cancelar reserva ajena (debe fallar)
      */
     @Test
+    @Order(41)
     void PR41(){
         loginAsAdmin();
         driver.navigate().to(URL + "/reservations/list");
@@ -1244,7 +1248,6 @@ class Sdi2526Entrega121ApplicationTests {
                 java.io.File[] files = downloadDir.toFile().listFiles(
                         f -> f.getName().endsWith(".csv") && !f.getName().endsWith(".part"));
                 if (files != null && files.length > 0) { csvFile = files[0]; break; }
-                Thread.sleep(500);
             }
             Assertions.assertNotNull(csvFile, "El CSV debería haberse descargado");
 
