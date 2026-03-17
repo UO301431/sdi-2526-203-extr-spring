@@ -4,10 +4,10 @@
 <body>
 <nav th:replace="fragments/nav"></nav>
 <div class="container" style="text-align: center">
-    <h2>BIENVENIDO</h2>
-    <h3>Esta es una zona privada la web</h3>
+    <h2 th:text="#{welcome.title}">BIENVENIDO</h2>
+    <h3 th:text="#{welcome.subtitle}">Esta es una zona privada la web</h3>
     <p>
-        <span>Usuario Autenticado como:</span>
+        <span th:text="#{welcome.authenticated}">Usuario Autenticado como:</span>
         <span th:text="${#authentication.name}"></span>
     </p>
 
