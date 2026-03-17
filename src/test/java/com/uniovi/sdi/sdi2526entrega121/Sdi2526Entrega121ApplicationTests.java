@@ -90,6 +90,14 @@ class Sdi2526Entrega121ApplicationTests {
         String checkText = "Identíficate";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+        checkText = "Listado de Reservas";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+
     }
 
     @Test
@@ -195,7 +203,7 @@ class Sdi2526Entrega121ApplicationTests {
 
     @Test
     @Order(10)
-    void PR09() {
+    void PR10() {
         // Administrador
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
@@ -209,7 +217,7 @@ class Sdi2526Entrega121ApplicationTests {
 
     @Test
     @Order(10)
-    void PR10() {
+    void PR09() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
 
@@ -888,6 +896,65 @@ class Sdi2526Entrega121ApplicationTests {
         }
 
         PO_LoginView.logout(driver);
+    }
+
+    /**
+     * [Prueba 37] Modificar la contraseña con datos validos
+     */
+    @Test
+    @Order(37)
+    public void PR37(){
+        loginAsUser();
+
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("password")).sendKeys("NewPass@12345");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("NewPass@12345");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        assertTrue(driver.getCurrentUrl().contains("/home"), "Debería redirigir a home tras éxito");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        PO_LoginView.fillLoginForm(driver, "10000001S", "NewPass@12345");
+        String checkText = "Listado de Reservas";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        //Para no cambiar el comportamiento de los tests
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("NewPass@12345");
+        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+
+    }
+
+    /**
+     * [Prueba 38] Modificar la contraseña con datos invalidos
+     */
+    @Test
+    @Order(38)
+    public void PR38(){
+        loginAsUser();
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("password")).sendKeys("  ");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("  ");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.empty",
+                PO_Properties.getSPANISH());
+
+        //Se juntan los dos errores porque esta vacia y no es una contraseña valida
+        String checkText ="Este campo no puede estar vacio.\n" +
+                        "La contraseña no es valida. La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 dígito, 1 caracter especial y tener entre 12 y 20 caracteres.";
+        Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
     /**
