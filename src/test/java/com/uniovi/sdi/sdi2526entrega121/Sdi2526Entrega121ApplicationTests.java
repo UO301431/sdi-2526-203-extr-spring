@@ -393,9 +393,6 @@ class Sdi2526Entrega121ApplicationTests {
 
         deactivateBtn.click();
 
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-
         // Verificar que el botón cambió a verde (estado: inactivo → botón Activar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
@@ -431,9 +428,6 @@ class Sdi2526Entrega121ApplicationTests {
                 .getText();
 
         activateBtn.click();
-
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         // Verificar que el botón cambió a amarillo (estado: activo → botón Desactivar)
         WebElement toggleBtn = driver.findElement(By.xpath(
