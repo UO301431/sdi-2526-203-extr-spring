@@ -6,7 +6,7 @@
 <nav th:replace="fragments/nav"></nav>
 
 <div class="container" id="main-container">
-    <h2 th:text="#{reservation.list.title}">Listado Global de Reservas</h2>
+    <h2 th:text="#{reservation.list.title}">Listado de Reservas</h2>
 
     <form class="form-inline" action="/reservations/list" method="GET">
         <div class="form-group">
@@ -120,6 +120,27 @@
     </div>
 
     <footer th:replace="fragments/pagination"></footer>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        document.addEventListener("DOMContentLoaded", function () {
+            const spaceId   = /*[[${param.spaceId != null and !#lists.isEmpty(param.spaceId) ? param.spaceId[0] : ''}]]*/ '';
+            const status    = /*[[${param.status != null and !#lists.isEmpty(param.status) ? param.status[0] : ''}]]*/ '';
+            const startDate = /*[[${param.startDate != null and !#lists.isEmpty(param.startDate) ? param.startDate[0] : ''}]]*/ '';
+            const endDate   = /*[[${param.endDate != null and !#lists.isEmpty(param.endDate) ? param.endDate[0] : ''}]]*/ '';
+
+            document.querySelectorAll(".pagination .page-link").forEach(function (link) {
+                const url = new URL(link.href);
+                if (spaceId)   url.searchParams.set("spaceId",   spaceId);
+                if (status)    url.searchParams.set("status",    status);
+                if (startDate) url.searchParams.set("startDate", startDate);
+                if (endDate)   url.searchParams.set("endDate",   endDate);
+                link.href = url.toString();
+            });
+        });
+        /*]]>*/
+    </script>
+
 </div>
 <footer th:replace="fragments/footer"></footer>
 </body>

@@ -1,5 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.controllers;
 
+import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
@@ -7,6 +8,7 @@ import com.uniovi.sdi.sdi2526entrega121.services.ReservaSecurityService;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
+import com.uniovi.sdi.sdi2526entrega121.validators.AddReservationValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -45,14 +48,16 @@ public class ReservationsController {
     private SpaceService spaceService;
 
     private final UsersService usersService;
+    private final AddReservationValidator addReservationValidator;
 
     /**
      * Constructor del controlador que inyecta el servicio de usuarios.
      *
      * @param usersService Servicio para la gestión de usuarios.
      */
-    public ReservationsController(UsersService usersService) {
+    public ReservationsController(UsersService usersService, AddReservationValidator addReservationValidator) {
         this.usersService = usersService;
+        this.addReservationValidator = addReservationValidator;
     }
 
     /**
@@ -163,11 +168,47 @@ public class ReservationsController {
      */
     @PostMapping("/reservations/add")
     public String setReservation(@ModelAttribute Reservation reservation,
-                                 Principal principal){
+                                 Principal principal,
+                                 BindingResult result,
+                                 Model model,
+                                 @RequestParam(value = "recurrenceFrequency", required = false) RecurrenceFrequency recurrenceFrequency,
+                                 @RequestParam(value = "recurrenceEndDate", required = false)
+                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate recurrenceEndDate) {
+
+        model.addAttribute("activeSpaces", spaceService.getActiveSpaces());
+
         String dni = principal.getName();
         User user = usersService.getUserByDni(dni);
         reservation.setUser(user);
-        reservationsService.addReservation(reservation);
+
+        // Validación básica de fechas (la que ya existía)
+        addReservationValidator.validate(reservation, result);
+        if(result.hasErrors()){
+            return "reservation/add";
+        }
+
+        // Sin recurrencia: flujo normal ya existente
+        if (recurrenceFrequency == null || recurrenceEndDate == null) {
+            reservationsService.addReservation(reservation);
+            model.addAttribute("successMessage", "reservation.add.success");
+            return "reservation/add";
+        }
+
+        // Validar que la fecha fin de recurrencia sea posterior al inicio
+        if (recurrenceEndDate.isBefore(reservation.getStartDate().toLocalDate())) {
+            model.addAttribute("errorMessage", "reservation.recurrence.endDateBeforeStart");
+            return "reservation/add";
+        }
+
+        boolean created = reservationsService.createRecurringReservations(
+                reservation, recurrenceFrequency, recurrenceEndDate);
+
+        if (!created) {
+            model.addAttribute("errorMessage", "reservation.recurrence.overlap");
+        } else {
+            model.addAttribute("successMessage", "reservation.recurrence.success");
+        }
+
         return "reservation/add";
     }
 

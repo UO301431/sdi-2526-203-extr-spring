@@ -14,8 +14,17 @@
             <li class="nav-item" sec:authorize="hasRole('ROLE_EMPLOYEE')">
                 <a class="nav-link" href="/spaces/list" th:text="#{navbar.availableSpaces}">Espacios Disponibles</a>
             </li>
-            <li class="nav-item" sec:authorize="isAuthenticated()">
-                <a class="nav-link" href="/reservations/list" th:text="#{navbar.reservations}">Reservas</a>
+
+            <li class="nav-item dropdown" sec:authorize="isAuthenticated()">
+                <a class="nav-link dropdown-toggle" href="#" id="reservationsMenu" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                   th:text="#{navbar.reservations}">Reservas</a>
+                <div class="dropdown-menu" aria-labelledby="reservationsMenu">
+                    <a class="dropdown-item" href="/reservations/list" th:text="#{navbar.viewReservations}">Ver Reservas</a>
+                    <a class="dropdown-item" href="/reservations/add"
+                       sec:authorize="hasRole('ROLE_EMPLOYEE')"
+                       th:text="#{navbar.createReservation}">Crear Reserva</a>
+                </div>
             </li>
 
             <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
