@@ -167,7 +167,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(7)
     void PR06() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
         String checkText = "Listado de Reservas";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
@@ -210,9 +210,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(10)
     void PR10() {
-        // Administrador
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
 
         By logoutSelector = By.xpath("//a[@href='/logout']");
         driver.findElement(logoutSelector).click();
