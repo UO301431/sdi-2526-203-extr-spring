@@ -66,4 +66,11 @@ public interface ReservationRepository  extends CrudRepository<Reservation, Long
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    @Query("SELECT COUNT(r) FROM Reservation r " +
+            "WHERE r.user.id = :userId " +
+            "AND r.status = 'ACTIVE'")
+    long countActiveByUser(
+            @Param("userId") Long userId
+    );
 }

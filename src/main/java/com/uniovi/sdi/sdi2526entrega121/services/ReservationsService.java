@@ -1,12 +1,10 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
-import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
-import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
-import com.uniovi.sdi.sdi2526entrega121.entities.User;
-import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
+import com.uniovi.sdi.sdi2526entrega121.entities.*;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +21,8 @@ public class ReservationsService {
     private ReservationRepository reservationRepository;
     @Autowired
     private UsersRepository usersRepository;
+    @Value("${reservation.max.active}")
+    private int maxActiveReservations;
 
     public Page<Reservation> getReservations(Pageable pageable) {
         return reservationRepository.findAll(pageable);
@@ -52,11 +52,15 @@ public class ReservationsService {
         }
     }
 
+    public boolean hasReachedLimit(Long userId) {
+        return reservationRepository.countActiveByUser(userId) >= maxActiveReservations;
+    }
+
     public void addReservation(Reservation reservation) {
         reservationRepository.save(reservation);
     }
 
-    public boolean createRecurringReservations(Reservation base,
+    public RecurringResult createRecurringReservations(Reservation base,
                                                RecurrenceFrequency frequency,
                                                LocalDate endDate) {
         List<Reservation> toSave = new ArrayList<>();
@@ -64,6 +68,22 @@ public class ReservationsService {
         LocalDateTime currentStart = base.getStartDate();
         LocalDateTime currentEnd = base.getEndDate();
         long durationMinutes = java.time.Duration.between(currentStart, currentEnd).toMinutes();
+
+        long currentActive = reservationRepository.countActiveByUser(base.getUser().getId());
+        long occurrences = 0;
+        LocalDateTime tmpStart = currentStart;
+        while (!tmpStart.toLocalDate().isAfter(endDate)) {
+            occurrences++;
+            switch (frequency) {
+                case DAILY:   tmpStart = tmpStart.plusDays(1); break;
+                case WEEKLY:  tmpStart = tmpStart.plusWeeks(1); break;
+                case MONTHLY: tmpStart = tmpStart.plusMonths(1); break;
+                case YEARLY:  tmpStart = tmpStart.plusYears(1); break;
+            }
+        }
+        if (currentActive + occurrences > maxActiveReservations) {
+            return RecurringResult.LIMIT_REACHED;
+        }
 
         while (!currentStart.toLocalDate().isAfter(endDate)) {
             boolean overlapReservation = reservationRepository.existsActiveOverlap(
@@ -79,7 +99,7 @@ public class ReservationsService {
             );
 
             if (overlapReservation || overlapBlock) {
-                return false;
+                return RecurringResult.OVERLAP;
             }
 
             Reservation r = new Reservation(
@@ -118,6 +138,6 @@ public class ReservationsService {
         }
         reservationRepository.saveAll(toSave);
 
-        return true;
+        return RecurringResult.SUCCESS;
     }
 }
