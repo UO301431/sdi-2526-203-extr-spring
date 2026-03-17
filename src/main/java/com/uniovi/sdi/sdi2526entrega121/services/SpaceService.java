@@ -3,7 +3,7 @@ package com.uniovi.sdi.sdi2526entrega121.services;
 import com.uniovi.sdi.sdi2526entrega121.entities.OccupiedSlot;
 import com.uniovi.sdi.sdi2526entrega121.entities.Space;
 import com.uniovi.sdi.sdi2526entrega121.entities.SpaceType;
-import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
+import com.uniovi.sdi.sdi2526entrega121.repositories.MaintenanceBlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import org.slf4j.Logger;
@@ -27,11 +27,11 @@ public class SpaceService {
     @Autowired
     private SpaceRepository spaceRepository;
 
-    private final BlockRepository blockRepository;
+    private final MaintenanceBlockRepository maintenanceBlockRepository;
     private final ReservationRepository reservationRepository;
 
-    public SpaceService(BlockRepository blockRepository, ReservationRepository reservationRepository) {
-        this.blockRepository = blockRepository;
+    public SpaceService(MaintenanceBlockRepository maintenanceBlockRepository, ReservationRepository reservationRepository) {
+        this.maintenanceBlockRepository = maintenanceBlockRepository;
         this.reservationRepository = reservationRepository;
     }
 
@@ -138,7 +138,8 @@ public class SpaceService {
                 .forEach(occupiedSlots::add);
 
         //se añden los "choques" con bloqueos tras mapear las a OccupiedSlot
-        blockRepository.findActiveBlocksInRange(spaceId, startDate, endDate)
+        maintenanceBlockRepository.findOverlappingActiveBlocks(spaceId, startDate, endDate, null)
+        //blockRepository.findActiveBlocksInRange(spaceId, startDate, endDate)
                 .stream()
                 .map(b -> new OccupiedSlot("BLOQUEO", b.getStartDate(), b.getEndDate(), b.getReason()))
                 .forEach(occupiedSlots::add);
