@@ -804,6 +804,43 @@ class Sdi2526Entrega121ApplicationTests {
         PO_LoginView.logout(driver);
     }
 
+    @Test
+    @Order(36)
+    void PR36(){
+        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+
+        driver.navigate().to(URL + "/reservations/list");
+
+        // PRIMERO COMPRUEBO QUE INICIALMENTE SOLO HAY UNA RESERVA CANCELADA
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[3]", 0);
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"main-container\"]/form/button", 0);
+        List<WebElement> statusCells = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        assertEquals(1, statusCells.size(), "Debería haber una reserva cancelada");
+        for (WebElement cell : statusCells) {
+            String cellText = cell.getText().toUpperCase();
+            Assertions.assertTrue(cellText.contains("CANCELADA") || cellText.contains("CANCELLED"),
+                    "El estado de la reserva listada debería ser CANCELADA, pero fue: " + cellText);
+        }
+
+        // AHORA CANCELO OTRA RESERVA
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[1]", 0);
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"main-container\"]/form/button", 0);
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"tableReservation\"]/table/tbody/tr[2]/td[6]/a", 0);
+
+        // COMPRUEBO QUE AHORA HAY DOS RESERVAS CANCELADAS
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[3]", 0);
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"main-container\"]/form/button", 0);
+        statusCells = driver.findElements(By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        assertEquals(2, statusCells.size(), "Debería haber dos reservas canceladas");
+        for (WebElement cell : statusCells) {
+            String cellText = cell.getText().toUpperCase();
+            Assertions.assertTrue(cellText.contains("CANCELADA") || cellText.contains("CANCELLED"),
+                    "El estado de la reserva listada debería ser CANCELADA, pero fue: " + cellText);
+        }
+
+        PO_LoginView.logout(driver);
+    }
+
     // [Prueba 42] Crear una reserva recurrente semanal válida y comprobar que
     // se han creado todas las reservas previstas.
     @Test
