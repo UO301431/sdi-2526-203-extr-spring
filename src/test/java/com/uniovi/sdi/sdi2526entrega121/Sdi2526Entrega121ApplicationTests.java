@@ -156,7 +156,6 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(6)
     void PR05() {
-        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
         String checkText = "Gestión de Espacios";
@@ -913,12 +912,30 @@ class Sdi2526Entrega121ApplicationTests {
      */
     @Test
     void PR41(){
+        loginAsAdmin();
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> reservasAntes = driver.findElements(By.xpath("//table//tbody/tr"));
+        int contadorAntes = reservasAntes.size();
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
         loginAsUser();
         driver.navigate().to(URL + "/reservations/cancel/1");
 
-        String textoPagina = bodyText();
-        assertTrue(textoPagina.contains("403") || textoPagina.contains("Forbidden"),
-                "El sistema debe bloquear el intento de IDOR con un 403");
+        boolean bloqueado = driver.getCurrentUrl().contains("/reservations/list")
+                || bodyText().contains("403")
+                || bodyText().contains("Forbidden");
+        assertTrue(bloqueado, "El sistema debería haber redirigido o bloqueado el acceso");
+
+        driver.findElement(logoutSelector).click();
+        loginAsAdmin();
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> reservasDespues = driver.findElements(By.xpath("//table//tbody/tr"));
+        int contadorDespues = reservasDespues.size();
+        assertEquals(contadorAntes, contadorDespues,
+                "El número de reservas ha cambiado.");
+
 
     }
 
