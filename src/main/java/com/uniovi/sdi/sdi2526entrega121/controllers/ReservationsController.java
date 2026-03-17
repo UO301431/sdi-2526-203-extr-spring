@@ -189,6 +189,10 @@ public class ReservationsController {
 
         // Sin recurrencia: flujo normal ya existente
         if (recurrenceFrequency == null || recurrenceEndDate == null) {
+            if (reservationsService.hasReachedLimit(user.getId())) {
+                model.addAttribute("errorMessage", "reservation.limit.reached");
+                return "reservation/add";
+            }
             reservationsService.addReservation(reservation);
             model.addAttribute("successMessage", "reservation.add.success");
             return "reservation/add";

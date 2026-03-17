@@ -7,6 +7,7 @@ import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,8 @@ public class ReservationsService {
     private ReservationRepository reservationRepository;
     @Autowired
     private UsersRepository usersRepository;
+    @Value("${reservation.max.active}")
+    private int maxActiveReservations;
 
     public Page<Reservation> getReservations(Pageable pageable) {
         return reservationRepository.findAll(pageable);
@@ -52,6 +55,10 @@ public class ReservationsService {
         }
     }
 
+    public boolean hasReachedLimit(Long userId) {
+        return reservationRepository.countActiveByUser(userId) >= maxActiveReservations;
+    }
+
     public void addReservation(Reservation reservation) {
         reservationRepository.save(reservation);
     }
@@ -64,6 +71,22 @@ public class ReservationsService {
         LocalDateTime currentStart = base.getStartDate();
         LocalDateTime currentEnd = base.getEndDate();
         long durationMinutes = java.time.Duration.between(currentStart, currentEnd).toMinutes();
+
+        long currentActive = reservationRepository.countActiveByUser(base.getUser().getId());
+        long occurrences = 0;
+        LocalDateTime tmpStart = currentStart;
+        while (!tmpStart.toLocalDate().isAfter(endDate)) {
+            occurrences++;
+            switch (frequency) {
+                case DAILY:   tmpStart = tmpStart.plusDays(1); break;
+                case WEEKLY:  tmpStart = tmpStart.plusWeeks(1); break;
+                case MONTHLY: tmpStart = tmpStart.plusMonths(1); break;
+                case YEARLY:  tmpStart = tmpStart.plusYears(1); break;
+            }
+        }
+        if (currentActive + occurrences > maxActiveReservations) {
+            return false;
+        }
 
         while (!currentStart.toLocalDate().isAfter(endDate)) {
             boolean overlapReservation = reservationRepository.existsActiveOverlap(
