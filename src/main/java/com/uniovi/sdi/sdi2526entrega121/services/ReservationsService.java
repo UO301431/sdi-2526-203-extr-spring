@@ -1,9 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
-import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
-import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
-import com.uniovi.sdi.sdi2526entrega121.entities.User;
-import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
+import com.uniovi.sdi.sdi2526entrega121.entities.*;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +60,7 @@ public class ReservationsService {
         reservationRepository.save(reservation);
     }
 
-    public boolean createRecurringReservations(Reservation base,
+    public RecurringResult createRecurringReservations(Reservation base,
                                                RecurrenceFrequency frequency,
                                                LocalDate endDate) {
         List<Reservation> toSave = new ArrayList<>();
@@ -85,7 +82,7 @@ public class ReservationsService {
             }
         }
         if (currentActive + occurrences > maxActiveReservations) {
-            return false;
+            return RecurringResult.LIMIT_REACHED;
         }
 
         while (!currentStart.toLocalDate().isAfter(endDate)) {
@@ -102,7 +99,7 @@ public class ReservationsService {
             );
 
             if (overlapReservation || overlapBlock) {
-                return false;
+                return RecurringResult.OVERLAP;
             }
 
             Reservation r = new Reservation(
@@ -141,6 +138,6 @@ public class ReservationsService {
         }
         reservationRepository.saveAll(toSave);
 
-        return true;
+        return RecurringResult.SUCCESS;
     }
 }
