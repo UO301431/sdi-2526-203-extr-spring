@@ -1,8 +1,7 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.*;
-import com.uniovi.sdi.sdi2526entrega121.entities.*;
-import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
+import com.uniovi.sdi.sdi2526entrega121.repositories.MaintenanceBlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
 import jakarta.annotation.PostConstruct;
@@ -17,15 +16,16 @@ public class InsertSampleDataService {
     private final UsersService usersService;
     private final SpaceRepository spaceRepository;
     private final ReservationRepository reservationRepository;
-    private final BlockRepository blockRepository;
+    private final MaintenanceBlockRepository maintenanceBlockRepository;
 
     public InsertSampleDataService(UsersService usersService,
                                    SpaceRepository spaceRepository,
-                                   ReservationRepository reservationRepository, BlockRepository blockRepository) {
+                                   ReservationRepository reservationRepository,
+                                   MaintenanceBlockRepository maintenanceBlockRepository) {
         this.usersService = usersService;
         this.spaceRepository = spaceRepository;
         this.reservationRepository = reservationRepository;
-        this.blockRepository = blockRepository;
+        this.maintenanceBlockRepository = maintenanceBlockRepository;
     }
 
     @PostConstruct
@@ -163,37 +163,33 @@ public class InsertSampleDataService {
         // 3. CREAR BLOQUEOS
         // ==========================================
         // Bloqueo 1: Mantenimiento programado
-        Block block_space5_1 = new Block(space5,
+        MaintenanceBlock block_space5_1 = new MaintenanceBlock(space5,
                 LocalDateTime.of(2027, 4, 10, 8, 0),
                 LocalDateTime.of(2027, 4, 10, 18, 0),
-                "Mantenimiento de instalaciones",
-                BlockStatus.ACTIVE);
+                "Mantenimiento de instalaciones");
 
         // Bloqueo 2: Evento especial
-        Block block_space5_2 = new Block(space5,
+        MaintenanceBlock block_space5_2 = new MaintenanceBlock(space5,
                 LocalDateTime.of(2027, 7, 20, 9, 0),
                 LocalDateTime.of(2027, 7, 20, 17, 0),
-                "Reservado para evento corporativo",
-                BlockStatus.ACTIVE);
+                "Reservado para evento corporativo");
 
         // Bloqueo 3: Fuera del rango
-        Block block_space5_3 = new Block(space5,
+        MaintenanceBlock block_space5_3 = new MaintenanceBlock(space5,
                 LocalDateTime.of(2028, 7, 20, 9, 0),
                 LocalDateTime.of(2028, 7, 20, 17, 0),
-                "Reservado para evento educativo",
-                BlockStatus.ACTIVE);
+                "Reservado para evento educativo");
 
         // Bloqueo para prueba
-        Block block_space1_test_33 = new Block(space1,
+        MaintenanceBlock block_space1_test_33 = new MaintenanceBlock(space1,
                 LocalDateTime.of(2029, 4, 10, 8, 0),
                 LocalDateTime.of(2029, 4, 10, 18, 0),
-                "Mantenimiento de instalaciones",
-                BlockStatus.ACTIVE);
+                "Mantenimiento de instalaciones");
 
         // Guardar todas los bloqueos
-        blockRepository.save(block_space5_1);
-        blockRepository.save(block_space5_2);
-        blockRepository.save(block_space5_3);
-        blockRepository.save(block_space1_test_33);
+        maintenanceBlockRepository.save(block_space5_1);
+        maintenanceBlockRepository.save(block_space5_2);
+        maintenanceBlockRepository.save(block_space5_3);
+        maintenanceBlockRepository.save(block_space1_test_33);
     }
 }
