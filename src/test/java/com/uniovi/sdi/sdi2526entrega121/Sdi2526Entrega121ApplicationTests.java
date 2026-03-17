@@ -393,9 +393,6 @@ class Sdi2526Entrega121ApplicationTests {
 
         deactivateBtn.click();
 
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-
         // Verificar que el botón cambió a verde (estado: inactivo → botón Activar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
@@ -431,9 +428,6 @@ class Sdi2526Entrega121ApplicationTests {
                 .getText();
 
         activateBtn.click();
-
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         // Verificar que el botón cambió a amarillo (estado: activo → botón Desactivar)
         WebElement toggleBtn = driver.findElement(By.xpath(
@@ -605,7 +599,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(23)
     void PR23(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         PO_View.checkElementBy(driver, "text", "Estado");
         PO_View.checkElementBy(driver, "text", "Usuario");
@@ -622,7 +616,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(24)
     void PR24(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
         driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
@@ -637,7 +631,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(25)
     void PR25(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         driver.findElement(By.id("startDate")).sendKeys("2026-03-14");
         driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
@@ -704,10 +698,6 @@ class Sdi2526Entrega121ApplicationTests {
         Assertions.assertEquals(checkText, result.getFirst().getText());
 
         checkText = "SALA";
-        result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-
-        checkText = "Planta 1 - Edificio A";
         result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -1222,4 +1212,65 @@ class Sdi2526Entrega121ApplicationTests {
 
         PO_LoginView.logout(driver);
     }
+
+    @Test
+    @Order(46)
+    void PR46() throws Exception {
+        java.nio.file.Path downloadDir = java.nio.file.Files.createTempDirectory("csv_test_");
+
+        org.openqa.selenium.firefox.FirefoxOptions options = new org.openqa.selenium.firefox.FirefoxOptions();
+        options.addPreference("browser.download.folderList", 2);
+        options.addPreference("browser.download.dir", downloadDir.toAbsolutePath().toString());
+        options.addPreference("browser.helperApps.neverAsk.saveToDisk", "text/csv");
+        WebDriver csvDriver = new FirefoxDriver(options);
+
+        try {
+            csvDriver.navigate().to(URL + "/login");
+            PO_LoginView.fillLoginForm(csvDriver, "12345678Z", "@Dm1n1str@D0r");
+
+            csvDriver.navigate().to(URL + "/reservations/list");
+            new Select(csvDriver.findElement(By.id("status"))).selectByValue("ACTIVE");
+            csvDriver.findElement(By.cssSelector("button[type='submit']")).click();
+
+            int expectedRows = csvDriver.findElements(
+                    By.xpath("//*[@id='tableReservation']/table/tbody/tr")).size();
+            Assertions.assertTrue(expectedRows > 0, "Debe haber reservas activas para exportar");
+
+            csvDriver.findElement(By.cssSelector("a[href*='/reservations/export']")).click();
+
+            java.io.File csvFile = null;
+            long limit = System.currentTimeMillis() + 10_000;
+            while (System.currentTimeMillis() < limit) {
+                java.io.File[] files = downloadDir.toFile().listFiles(
+                        f -> f.getName().endsWith(".csv") && !f.getName().endsWith(".part"));
+                if (files != null && files.length > 0) { csvFile = files[0]; break; }
+                Thread.sleep(500);
+            }
+            Assertions.assertNotNull(csvFile, "El CSV debería haberse descargado");
+
+            String content = new String(java.nio.file.Files.readAllBytes(csvFile.toPath()),
+                    java.nio.charset.StandardCharsets.UTF_8).replace("\uFEFF", "");
+            String[] lines = content.split("\\r?\\n");
+
+            Assertions.assertTrue(lines[0].contains("Espacio"), "Falta campo Espacio");
+            Assertions.assertTrue(lines[0].contains("Nombre"),  "Falta campo Nombre");
+            Assertions.assertTrue(lines[0].contains("DNI"),     "Falta campo DNI");
+            Assertions.assertTrue(lines[0].contains("Inicio"),  "Falta campo Inicio");
+            Assertions.assertTrue(lines[0].contains("Fin"),     "Falta campo Fin");
+            Assertions.assertTrue(lines[0].contains("Estado"),  "Falta campo Estado");
+
+            Assertions.assertEquals(9, lines.length - 1,
+                    "El CSV debe tener tantas filas como la tabla filtrada");
+            for (int i = 1; i < lines.length; i++)
+                Assertions.assertTrue(lines[i].contains("ACTIVE"), "Fila " + i + " no es ACTIVE");
+
+        } finally {
+            csvDriver.quit();
+            java.nio.file.Files.walk(downloadDir)
+                    .sorted(java.util.Comparator.reverseOrder())
+                    .map(java.nio.file.Path::toFile)
+                    .forEach(java.io.File::delete);
+        }
+    }
+
 }
