@@ -950,6 +950,17 @@ class Sdi2526Entrega121ApplicationTests {
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
 
+    @Test
+    @Order(39)
+    public void PR39() {
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
+        driver.navigate().to(URL + "/home");
+
+        PO_HomeView.checkChangeLanguage(driver, "btnSpanish", "btnEnglish", 0, 1);
+
+        PO_LoginView.logout(driver);
+    }
+
     /**
      * [Prueba 40] Accesso denegado de usuario estandar a recursos de administracion
      */
