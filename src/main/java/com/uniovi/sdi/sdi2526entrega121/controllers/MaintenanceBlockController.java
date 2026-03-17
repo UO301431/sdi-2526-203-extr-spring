@@ -8,6 +8,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,8 @@ import java.util.Locale;
  */
 @Controller
 @RequestMapping("/blocks")
+// Este controlador requiere ser ADMIN para poder utilizarse
+@PreAuthorize("hasRole('ADMIN')")
 public class MaintenanceBlockController {
 
     @Autowired
@@ -43,11 +46,14 @@ public class MaintenanceBlockController {
      * Se usa en cada método para proteger el acceso a las operaciones de bloqueo.
      * @return true si el usuario tiene ROLE_ADMIN, false en caso contrario
      */
+    // ── Helper: comprueba si el usuario autenticado es admin ──────────────────
+    /**
     private boolean isAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
+     */
 
     /**
      * Muestra el listado paginado de bloqueos de mantenimiento de un espacio concreto.
@@ -57,7 +63,7 @@ public class MaintenanceBlockController {
      */
     @GetMapping("/list/{spaceId}")
     public String listBlocks(@PathVariable Long spaceId, Model model, Pageable pageable) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         Page<MaintenanceBlock> blocks = blockService.getBlocksBySpace(spaceId, pageable);
         model.addAttribute("blocks", blocks.getContent());
         model.addAttribute("page", blocks);
@@ -73,7 +79,7 @@ public class MaintenanceBlockController {
      */
     @GetMapping("/new/{spaceId}")
     public String newBlockForm(@PathVariable Long spaceId, Model model) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
         model.addAttribute("spaceId", spaceId);
         spaceService.findById(spaceId).ifPresent(s -> model.addAttribute("space", s));
         return "maintenance/form";
@@ -105,11 +111,13 @@ public class MaintenanceBlockController {
             RedirectAttributes redirectAttrs,
             Locale locale) {
 
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
 
         String error = blockService.createBlock(spaceId, startDate, endDate, reason);
         if (error != null) {
+
             model.addAttribute("errorMessage", messageSource.getMessage(error, null, locale));
+
             model.addAttribute("spaceId", spaceId);
             model.addAttribute("startDate", startDate);
             model.addAttribute("endDate", endDate);
@@ -137,9 +145,8 @@ public class MaintenanceBlockController {
     public String cancelBlock(@PathVariable Long blockId,
                               RedirectAttributes redirectAttrs,
                               Locale locale) {
-        if (!isAdmin()) return "redirect:/spaces/list";
+        //if (!isAdmin()) return "redirect:/spaces/list";
 
-        // Obtener el spaceId antes de cancelar para poder redirigir correctamente
         Long spaceId = blockService.findById(blockId)
                 .map(b -> b.getSpace().getId())
                 .orElse(null);

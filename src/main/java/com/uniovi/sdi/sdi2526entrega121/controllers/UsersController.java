@@ -53,7 +53,8 @@ public class UsersController {
      * @return El nombre de la vista de registro si hay errores o redireccion a home si es correcto
      */
     @PostMapping("/signup")
-    public String signup(@ModelAttribute User user, BindingResult result, Model model) {
+    public String signup(Authentication auth, @ModelAttribute User user, BindingResult result, Model model) {
+        if(auth != null && auth.isAuthenticated()) { return "redirect:/home"; }
         signUpFormValidator.validate(user,result);
         if (result.hasErrors()) {
             return "signup";
@@ -96,7 +97,8 @@ public class UsersController {
      * @return El nombre de la vista "login"
      */
     @GetMapping("/login")
-    public String login(){
+    public String login(Authentication auth) {
+        if(auth != null && auth.isAuthenticated()) { return "redirect:/home"; }
         return "login";
     }
 
