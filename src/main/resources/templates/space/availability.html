@@ -1,24 +1,24 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head"> <title>Lista de Espacios</title> </head>
+<head th:replace="fragments/head"> <title th:text="#{space.list.title}">Lista de Espacios</title> </head>
 <body>
 <!-- Barra de Navegación superior -->
 <nav th:replace="fragments/nav"></nav>
 
 <div class="container" id="main-container">
-    <h2 th:text="${'Consultar disponibilidad de ' + space.name}"></h2>
+    <h2 th:text="#{space.availability.title(${space.name})}">Consultar disponibilidad de</h2>
     <form class="form-inline" action="/spaces/space/availability/info">
         <div class="form-group">
             <label>
                 <input type="number" th:value="${space.id}" hidden="hidden" name="id">
             </label>
 
-            <label for="startDate">Fecha inicio</label>
+            <label for="startDate" th:text="#{space.startDate}">Fecha inicio</label>
             <input type="datetime-local" id="startDate" name="startDate" class="form-control" required >
 
-            <label for="endDate">Fecha final</label>
+            <label for="endDate" th:text="#{space.endDate}">Fecha final</label>
             <input type="datetime-local" id="endDate" name="endDate" class="form-control" required>
-            <button type="submit" class="btn btn-primary">Consultar</button>
+            <button type="submit" class="btn btn-primary" th:text="#{space.search}">Consultar</button>
         </div>
     </form>
 </div>

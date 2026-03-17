@@ -1,19 +1,19 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/head"> <title>Lista de Espacios</title> </head>
+<head th:replace="fragments/head"> <title th:text="#{space.list.title}">Lista de Espacios</title> </head>
 <body>
 <!-- Barra de Navegación superior -->
 <nav th:replace="fragments/nav"></nav>
 
 <div class="container" id="main-container">
-    <h2 th:text="${'Disponibilidad de ' + spaceName}"></h2>
+    <h2 th:text="#{space.availability.result(${spaceName})}">Disponibilidad de</h2>
     <table class="table table-hover" id="availableSpaceTable">
         <thead>
         <tr>
-            <th scope="col">Razon</th>
-            <th scope="col">Fecha de inicio</th>
-            <th scope="col">Fecha de final</th>
-            <th scope="col">Motivo</th>
+            <th scope="col" th:text="#{space.table.reason}">Razon</th>
+            <th scope="col" th:text="#{space.table.startDate}">Fecha de inicio</th>
+            <th scope="col" th:text="#{space.table.endDate}">Fecha de final</th>
+            <th scope="col" th:text="#{space.table.motive}">Motivo</th>
         </tr>
         </thead>
         <tbody>
