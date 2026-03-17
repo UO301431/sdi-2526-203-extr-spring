@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                                 "/spaces/edit/*",
                                 "/spaces/list/*",
                                 "/spaces/new/*").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/reservations/add").hasAuthority("ROLE_EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
