@@ -3,7 +3,6 @@ package com.uniovi.sdi.sdi2526entrega121.services;
 import com.uniovi.sdi.sdi2526entrega121.entities.OccupiedSlot;
 import com.uniovi.sdi.sdi2526entrega121.entities.Space;
 import com.uniovi.sdi.sdi2526entrega121.entities.SpaceType;
-import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.MaintenanceBlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
@@ -28,12 +27,10 @@ public class SpaceService {
     @Autowired
     private SpaceRepository spaceRepository;
 
-    private final BlockRepository blockRepository;
     private final MaintenanceBlockRepository maintenanceBlockRepository;
     private final ReservationRepository reservationRepository;
 
-    public SpaceService(BlockRepository blockRepository, MaintenanceBlockRepository maintenanceBlockRepository, ReservationRepository reservationRepository) {
-        this.blockRepository = blockRepository;
+    public SpaceService(MaintenanceBlockRepository maintenanceBlockRepository, ReservationRepository reservationRepository) {
         this.maintenanceBlockRepository = maintenanceBlockRepository;
         this.reservationRepository = reservationRepository;
     }

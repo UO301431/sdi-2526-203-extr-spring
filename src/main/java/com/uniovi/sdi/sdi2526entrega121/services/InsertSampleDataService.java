@@ -1,8 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121.services;
 
 import com.uniovi.sdi.sdi2526entrega121.entities.*;
-import com.uniovi.sdi.sdi2526entrega121.entities.*;
-import com.uniovi.sdi.sdi2526entrega121.repositories.BlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.MaintenanceBlockRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.ReservationRepository;
 import com.uniovi.sdi.sdi2526entrega121.repositories.SpaceRepository;
@@ -18,18 +16,15 @@ public class InsertSampleDataService {
     private final UsersService usersService;
     private final SpaceRepository spaceRepository;
     private final ReservationRepository reservationRepository;
-    private final BlockRepository blockRepository;
     private final MaintenanceBlockRepository maintenanceBlockRepository;
 
     public InsertSampleDataService(UsersService usersService,
                                    SpaceRepository spaceRepository,
                                    ReservationRepository reservationRepository,
-                                   BlockRepository blockRepository,
                                    MaintenanceBlockRepository maintenanceBlockRepository) {
         this.usersService = usersService;
         this.spaceRepository = spaceRepository;
         this.reservationRepository = reservationRepository;
-        this.blockRepository = blockRepository;
         this.maintenanceBlockRepository = maintenanceBlockRepository;
     }
 
