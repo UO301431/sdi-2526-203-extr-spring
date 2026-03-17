@@ -1,5 +1,6 @@
 package com.uniovi.sdi.sdi2526entrega121;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfiguration {
+
+    @Autowired
+    private CustomSuccessHandler customSuccessHandler;
+
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
@@ -35,14 +40,20 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/script/**", "/", "/signup",
                                 "/login/**").permitAll()
-                        .requestMatchers("/reservations/export").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/reservations/cancel*").hasAuthority("ROLE_EMPLOYEE")
+                        .requestMatchers("/reservations/export",
+                                "/toggle/*",
+                                "/spaces/new",
+                                "/spaces/edit/*",
+                                "/spaces/list/*",
+                                "/spaces/new/*").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/reservations/add").hasAuthority("ROLE_EMPLOYEE")
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
+                        .successHandler(customSuccessHandler)
+                        .failureUrl("/login?error=true")
                         .permitAll())
                 .logout((logout) -> logout
                     .logoutUrl("/logout").permitAll())

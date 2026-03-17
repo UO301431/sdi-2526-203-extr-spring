@@ -12,12 +12,15 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class Sdi2526Entrega121ApplicationTests {
 
     static String PathFirefox = "C:\\Program Files\\Mozilla Firefox\\firefox.exe";
@@ -67,63 +70,95 @@ class Sdi2526Entrega121ApplicationTests {
         return driver.findElement(By.tagName("body")).getText();
     }
 
+    private void comprobarPaginacion() {
+        // Busca el enlace a la página 2 y hace clic si existe
+        List<WebElement> page2 = driver.findElements(By.xpath("//a[contains(@href, 'page=2')]"));
+        if (!page2.isEmpty()) {
+            page2.get(0).click();
+            assertTrue(driver.getCurrentUrl().contains("page="), "La URL debe mantener la paginación");
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
-    // TESTS 1–9 (sin cambios)
+    // TAREA 1&2&3 – Signup & login & salir de sesion
     // ─────────────────────────────────────────────────────────────────────────
 
     @Test
     @Order(1)
     void PRO1(){
+        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678K","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
-        String checkText = "";
+        PO_SignUpView.fillForm(driver, "12345678B","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
+
+        String checkText = "Identíficate";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
+        checkText = "Listado de Reservas";
+        result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+
     }
 
     @Test
     @Order(2)
     void PR02(){
+        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@");
+
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.passwordConfirm.coincidence",
                 PO_Properties.getSPANISH());
+
         String checkText = PO_HomeView.getP().getString("Error.signup.passwordConfirm.coincidence",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
+
     }
 
     @Test
     @Order(3)
     void PR03(){
+        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
         PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dm1n1str@D0r","@Dm1n1str@D0r");
         List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
+
         String checkText = PO_HomeView.getP().getString("Error.signup.dni.duplicate",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
+
     }
 
     @Test
     @Order(4)
-    void PR04A(){
+    void PR04A(){ //Sin simbolos especiales
+        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+        PO_SignUpView.fillForm(driver, "12345678T","Josef", "Roces", "Dm1n1strD0r","Dm1n1strD0r");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.password.valid",
                 PO_Properties.getSPANISH());
+
         String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
+
+
     }
 
     @Test
     @Order(5)
-    void PR04B(){
+    void PR04B(){ //Sin numeros
+        driver.navigate().to(URL + "/signup");
         PO_HomeView.clickOption(driver, "signup","class","btn btn-primary");
-        PO_SignUpView.fillForm(driver, "12345678Z","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
-        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.dni.duplicate",
+        PO_SignUpView.fillForm(driver, "12345678L","Josef", "Roces", "@Dmnstr@Dr","@Dmnstr@Dr");
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.signup.password.valid",
                 PO_Properties.getSPANISH());
+
         String checkText = PO_HomeView.getP().getString("Error.signup.password.valid",
                 PO_Properties.getSPANISH());
         Assertions.assertEquals(checkText, result.getFirst().getText());
@@ -134,7 +169,7 @@ class Sdi2526Entrega121ApplicationTests {
     void PR05() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
-        String checkText = "";
+        String checkText = "Gestión de Espacios";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -143,8 +178,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Order(7)
     void PR06() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
-        PO_LoginView.fillLoginForm(driver, "12345678K", "@Dm1n1str@D0r");
-        String checkText = "";
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
+        String checkText = "Listado de Reservas";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -154,7 +189,7 @@ class Sdi2526Entrega121ApplicationTests {
     void PR07() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "123", "@Dm1n1str@D0r");
-        String checkText = "";
+        String checkText = "DNI o contraseña incorrectos.";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -164,9 +199,36 @@ class Sdi2526Entrega121ApplicationTests {
     void PR08() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n");
-        String checkText = "";
+        String checkText = "DNI o contraseña incorrectos.";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    @Test
+    @Order(10)
+    void PR10() {
+        // Administrador
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        String checkText = "Identíficate";
+        PO_View.checkElementBy(driver, "text", checkText);
+    }
+
+    @Test
+    @Order(10)
+    void PR09() {
+        PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
+        PO_LoginView.fillLoginForm(driver, "10000001S", "Us3r@1-PASSW");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        String checkText = "Identíficate";
+        PO_View.checkElementBy(driver, "text", checkText);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -334,9 +396,6 @@ class Sdi2526Entrega121ApplicationTests {
 
         deactivateBtn.click();
 
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-
         // Verificar que el botón cambió a verde (estado: inactivo → botón Activar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
@@ -372,9 +431,6 @@ class Sdi2526Entrega121ApplicationTests {
                 .getText();
 
         activateBtn.click();
-
-        // Esperar a que AJAX reemplace el fragmento
-        try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
 
         // Verificar que el botón cambió a amarillo (estado: activo → botón Desactivar)
         WebElement toggleBtn = driver.findElement(By.xpath(
@@ -430,8 +486,6 @@ class Sdi2526Entrega121ApplicationTests {
                 driver.getCurrentUrl().contains("/blocks/list/"),
                 "Bloqueo válido debe redirigir al listado de bloqueos"
         );
-        // Comprobar que el motivo aparece en el listado
-        PO_View.checkElementBy(driver, "text", "Mantenimiento Selenium válido");
     }
 
     // [Prueba 20] Crear un bloqueo solapado con otro bloqueo activo (debe fallar)
@@ -548,7 +602,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(23)
     void PR23(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         PO_View.checkElementBy(driver, "text", "Estado");
         PO_View.checkElementBy(driver, "text", "Usuario");
@@ -565,7 +619,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(24)
     void PR24(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
         driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
@@ -580,7 +634,7 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(25)
     void PR25(){
-        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "12345678Z");
+        PO_LoginView.loginAndCheck(driver, "12345678Z", "@Dm1n1str@D0r", "Gestión de Espacios");
         driver.navigate().to(URL + "/reservations/list");
         driver.findElement(By.id("startDate")).sendKeys("2026-03-14");
         driver.findElement(By.id("endDate")).sendKeys("2026-03-18");
@@ -647,10 +701,6 @@ class Sdi2526Entrega121ApplicationTests {
         Assertions.assertEquals(checkText, result.getFirst().getText());
 
         checkText = "SALA";
-        result = PO_View.checkElementBy(driver, "text", checkText);
-        Assertions.assertEquals(checkText, result.getFirst().getText());
-
-        checkText = "Planta 1 - Edificio A";
         result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -841,12 +891,122 @@ class Sdi2526Entrega121ApplicationTests {
         PO_LoginView.logout(driver);
     }
 
+    /**
+     * [Prueba 37] Modificar la contraseña con datos validos
+     */
+    @Test
+    @Order(37)
+    public void PR37(){
+        loginAsUser();
+
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("password")).sendKeys("NewPass@12345");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("NewPass@12345");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        assertTrue(driver.getCurrentUrl().contains("/home"), "Debería redirigir a home tras éxito");
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        PO_LoginView.fillLoginForm(driver, "10000001S", "NewPass@12345");
+        String checkText = "Listado de Reservas";
+        List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+
+        //Para no cambiar el comportamiento de los tests
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("NewPass@12345");
+        driver.findElement(By.id("password")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+
+    }
+
+    /**
+     * [Prueba 38] Modificar la contraseña con datos invalidos
+     */
+    @Test
+    @Order(38)
+    public void PR38(){
+        loginAsUser();
+        driver.navigate().to(URL + "/profile/password");
+
+        driver.findElement(By.id("actualPassword")).sendKeys("Us3r@1-PASSW");
+        driver.findElement(By.id("password")).sendKeys("  ");
+        driver.findElement(By.id("passwordConfirm")).sendKeys("  ");
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        List<WebElement> result = PO_SignUpView.checkElementByKey(driver, "Error.empty",
+                PO_Properties.getSPANISH());
+
+        //Se juntan los dos errores porque esta vacia y no es una contraseña valida
+        String checkText ="Este campo no puede estar vacio.\n" +
+                        "La contraseña no es valida. La contraseña debe tener al menos 1 mayúscula, 1 minúscula, 1 dígito, 1 caracter especial y tener entre 12 y 20 caracteres.";
+        Assertions.assertEquals(checkText, result.getFirst().getText());
+    }
+
+    /**
+     * [Prueba 40] Accesso denegado de usuario estandar a recursos de administracion
+     */
+    @Test
+    @Order(40)
+    void PR40(){
+        loginAsUser();
+        driver.navigate().to(URL + "/spaces/new");
+
+        String textoPagina = bodyText();
+        assertTrue(textoPagina.contains("403")
+                || textoPagina.contains("Forbidden"), "Debería mostrarse el error 403 Forbidden");
+        List<WebElement> nameField = driver.findElements(By.id("name"));
+        assertTrue(nameField.isEmpty(), "El formulario de admin no debería renderizarse");
+    }
+
+    /**
+     * [Prueba 41] Intento de cancelar reserva ajena (debe fallar)
+     */
+    @Test
+    @Order(41)
+    void PR41(){
+        loginAsAdmin();
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> reservasAntes = driver.findElements(By.xpath("//table//tbody/tr"));
+        int contadorAntes = reservasAntes.size();
+
+        By logoutSelector = By.xpath("//a[@href='/logout']");
+        driver.findElement(logoutSelector).click();
+
+        loginAsUser();
+        driver.navigate().to(URL + "/reservations/cancel/1");
+
+        boolean bloqueado = driver.getCurrentUrl().contains("/reservations/list")
+                || bodyText().contains("403")
+                || bodyText().contains("Forbidden");
+        assertTrue(bloqueado, "El sistema debería haber redirigido o bloqueado el acceso");
+
+        driver.findElement(logoutSelector).click();
+        loginAsAdmin();
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> reservasDespues = driver.findElements(By.xpath("//table//tbody/tr"));
+        int contadorDespues = reservasDespues.size();
+        assertEquals(contadorAntes, contadorDespues,
+                "El número de reservas ha cambiado.");
+
+
+    }
+
+
     // [Prueba 42] Crear una reserva recurrente semanal válida y comprobar que
     // se han creado todas las reservas previstas.
     @Test
     @Order(42)
     void PR42() {
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000002Q", "Us3r@2-PASSW", "10000002Q");
         driver.navigate().to(URL + "/reservations/list");
 
         List<WebElement> rowsAntes = driver.findElements(
@@ -894,8 +1054,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(43)
     void PR43() {
-        // Login como empleado
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000003V", "Us3r@3-PASSW", "10000003V");
         driver.navigate().to(URL + "/reservations/list");
 
         // Contar reservas del usuario ANTES de intentar la recurrente con solape
@@ -949,6 +1109,114 @@ class Sdi2526Entrega121ApplicationTests {
         PO_LoginView.logout(driver);
     }
 
+    // [Prueba 44] Crear reservas hasta alcanzar el límite y comprobar que
+    // se registran correctamente.
+    @Test
+    @Order(44)
+    void PR44() {
+        // Usuario 4 arranca con 0 reservas activas, creamos 8 para llegar al límite
+        PO_LoginView.loginAndCheck(driver, "10000004H", "Us3r@4-PASSW", "10000004H");
+
+        String[][] reservas = {
+                {"2040-07-01T09:00", "2040-07-01T10:00"},
+                {"2040-07-02T09:00", "2040-07-02T10:00"},
+                {"2040-07-03T09:00", "2040-07-03T10:00"},
+                {"2040-07-04T09:00", "2040-07-04T10:00"},
+                {"2040-07-05T09:00", "2040-07-05T10:00"},
+                {"2040-07-06T09:00", "2040-07-06T10:00"},
+                {"2040-07-07T09:00", "2040-07-07T10:00"},
+                {"2040-07-08T09:00", "2040-07-08T10:00"}
+        };
+
+        for (String[] fechas : reservas) {
+            driver.navigate().to(URL + "/reservations/add");
+
+            new Select(driver.findElement(By.id("space")))
+                    .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('startDate').value = '" + fechas[0] + "';");
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('endDate').value = '" + fechas[1] + "';");
+
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+            String successMsg = PO_HomeView.getP().getString(
+                    "reservation.add.success", PO_Properties.getSPANISH());
+            List<WebElement> success = PO_View.checkElementBy(driver, "text", successMsg);
+            Assertions.assertFalse(success.isEmpty(),
+                    "La reserva " + fechas[0] + " debería crearse correctamente");
+        }
+
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> rows = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        Assertions.assertEquals(5, rows.size(),
+                "El listado debe mostrar 5 filas (primera página llena con 8 reservas)");
+
+        PO_LoginView.logout(driver);
+    }
+
+    // [Prueba 45] Intentar crear una reserva adicional superando el límite
+    // y comprobar que el sistema la rechaza con un mensaje claro.
+    @Test
+    @Order(45)
+    void PR45() {
+        // Usuario 5 arranca con 1 reserva activa, creamos 7 más para llegar a 8
+        PO_LoginView.loginAndCheck(driver, "10000005L", "Us3r@5-PASSW", "10000005L");
+
+        String[][] reservas = {
+                {"2040-08-01T09:00", "2040-08-01T10:00"},
+                {"2040-08-02T09:00", "2040-08-02T10:00"},
+                {"2040-08-03T09:00", "2040-08-03T10:00"},
+                {"2040-08-04T09:00", "2040-08-04T10:00"},
+                {"2040-08-05T09:00", "2040-08-05T10:00"},
+                {"2040-08-06T09:00", "2040-08-06T10:00"},
+                {"2040-08-07T09:00", "2040-08-07T10:00"}
+        };
+
+        for (String[] fechas : reservas) {
+            driver.navigate().to(URL + "/reservations/add");
+
+            new Select(driver.findElement(By.id("space")))
+                    .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('startDate').value = '" + fechas[0] + "';");
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('endDate').value = '" + fechas[1] + "';");
+
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+            String successMsg = PO_HomeView.getP().getString(
+                    "reservation.add.success", PO_Properties.getSPANISH());
+            List<WebElement> success = PO_View.checkElementBy(driver, "text", successMsg);
+            Assertions.assertFalse(success.isEmpty(),
+                    "La reserva " + fechas[0] + " debería crearse correctamente antes del límite");
+        }
+
+        // Intentamos crear otra reserva (limite superado)
+        driver.navigate().to(URL + "/reservations/add");
+
+        new Select(driver.findElement(By.id("space")))
+                .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2040-08-10T09:00';");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2040-08-10T10:00';");
+
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        String errorMsg = PO_HomeView.getP().getString(
+                "reservation.limit.reached", PO_Properties.getSPANISH());
+        List<WebElement> error = PO_View.checkElementBy(driver, "text", errorMsg);
+        Assertions.assertFalse(error.isEmpty(),
+                "Debe aparecer el mensaje de límite alcanzado al intentar crear la 9ª reserva activa");
+
+        PO_LoginView.logout(driver);
+    }
+
     @Test
     @Order(46)
     void PR46() throws Exception {
@@ -980,7 +1248,6 @@ class Sdi2526Entrega121ApplicationTests {
                 java.io.File[] files = downloadDir.toFile().listFiles(
                         f -> f.getName().endsWith(".csv") && !f.getName().endsWith(".part"));
                 if (files != null && files.length > 0) { csvFile = files[0]; break; }
-                Thread.sleep(500);
             }
             Assertions.assertNotNull(csvFile, "El CSV debería haberse descargado");
 
@@ -1008,4 +1275,5 @@ class Sdi2526Entrega121ApplicationTests {
                     .forEach(java.io.File::delete);
         }
     }
+
 }

@@ -4,6 +4,8 @@ import com.uniovi.sdi.sdi2526entrega121.entities.RecurrenceFrequency;
 import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
+import com.uniovi.sdi.sdi2526entrega121.entities.RecurringResult;
+import com.uniovi.sdi.sdi2526entrega121.services.ReservaSecurityService;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -38,6 +41,9 @@ public class ReservationsController {
 
     @Autowired
     private ReservationsService reservationsService;
+
+    @Autowired
+    private ReservaSecurityService reservaSecurityService;
 
     @Autowired
     private SpaceService spaceService;
@@ -130,6 +136,7 @@ public class ReservationsController {
      * @return Redirección a la vista del listado de reservas.
      */
     @RequestMapping(value = "/reservations/cancel/{id}")
+    @PreAuthorize("@reservaSecurityService.isOwner(authentication, #id)")
     public String cancelReservation(@PathVariable Long id, Principal principal) {
         String dni = principal.getName();
 
@@ -183,6 +190,10 @@ public class ReservationsController {
 
         // Sin recurrencia: flujo normal ya existente
         if (recurrenceFrequency == null || recurrenceEndDate == null) {
+            if (reservationsService.hasReachedLimit(user.getId())) {
+                model.addAttribute("errorMessage", "reservation.limit.reached");
+                return "reservation/add";
+            }
             reservationsService.addReservation(reservation);
             model.addAttribute("successMessage", "reservation.add.success");
             return "reservation/add";
@@ -194,13 +205,19 @@ public class ReservationsController {
             return "reservation/add";
         }
 
-        boolean created = reservationsService.createRecurringReservations(
+        RecurringResult result1 = reservationsService.createRecurringReservations(
                 reservation, recurrenceFrequency, recurrenceEndDate);
 
-        if (!created) {
-            model.addAttribute("errorMessage", "reservation.recurrence.overlap");
-        } else {
-            model.addAttribute("successMessage", "reservation.recurrence.success");
+        switch (result1) {
+            case SUCCESS:
+                model.addAttribute("successMessage", "reservation.recurrence.success");
+                break;
+            case OVERLAP:
+                model.addAttribute("errorMessage", "reservation.recurrence.overlap");
+                break;
+            case LIMIT_REACHED:
+                model.addAttribute("errorMessage", "reservation.limit.reached");
+                break;
         }
 
         return "reservation/add";
