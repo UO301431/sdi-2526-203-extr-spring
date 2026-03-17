@@ -422,14 +422,19 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        // Localizar el primer botón "Activar" y el nombre del espacio en su fila
-        WebElement activateBtn = driver.findElement(By.xpath(
-                "//button[contains(@class,'btn-toggle') and contains(@class,'btn-success')]"
+        // Paso 1: desactivar el primer espacio activo para tener uno inactivo
+        WebElement deactivateBtn = driver.findElement(By.xpath(
+                "//button[contains(@class,'btn-toggle') and contains(@class,'btn-warning')]"
         ));
-        String spaceName = activateBtn
+        String spaceName = deactivateBtn
                 .findElement(By.xpath("ancestor::tr/td[1]"))
                 .getText();
+        deactivateBtn.click();
 
+        // Paso 2: activar ese mismo espacio
+        WebElement activateBtn = driver.findElement(By.xpath(
+                "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
+        ));
         activateBtn.click();
 
         // Verificar que el botón cambió a amarillo (estado: activo → botón Desactivar)
