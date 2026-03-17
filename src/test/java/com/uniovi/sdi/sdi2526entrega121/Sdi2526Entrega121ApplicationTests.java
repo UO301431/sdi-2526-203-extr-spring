@@ -169,7 +169,7 @@ class Sdi2526Entrega121ApplicationTests {
     void PR06() {
         PO_HomeView.clickOption(driver, "login", "class", "btn btn-primary");
         PO_LoginView.fillLoginForm(driver, "12345678B", "@Dm1n1str@D0r");
-        String checkText = "Listado Global de Reservas";
+        String checkText = "Listado de Reservas";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
     }
@@ -891,6 +891,37 @@ class Sdi2526Entrega121ApplicationTests {
 
         PO_LoginView.logout(driver);
     }
+
+    /**
+     * [Prueba 40] Accesso denegado de usuario estandar a recursos de administracion
+     */
+    @Test
+    @Order(40)
+    void PR40(){
+        loginAsUser();
+        driver.navigate().to(URL + "/spaces/new");
+
+        String textoPagina = bodyText();
+        assertTrue(textoPagina.contains("403")
+                || textoPagina.contains("Forbidden"), "Debería mostrarse el error 403 Forbidden");
+        List<WebElement> nameField = driver.findElements(By.id("name"));
+        assertTrue(nameField.isEmpty(), "El formulario de admin no debería renderizarse");
+    }
+
+    /**
+     * [Prueba 41] Intento de cancelar reserva ajena (debe fallar)
+     */
+    @Test
+    void PR41(){
+        loginAsUser();
+        driver.navigate().to(URL + "/reservations/cancel/1");
+
+        String textoPagina = bodyText();
+        assertTrue(textoPagina.contains("403") || textoPagina.contains("Forbidden"),
+                "El sistema debe bloquear el intento de IDOR con un 403");
+
+    }
+
 
     // [Prueba 42] Crear una reserva recurrente semanal válida y comprobar que
     // se han creado todas las reservas previstas.
