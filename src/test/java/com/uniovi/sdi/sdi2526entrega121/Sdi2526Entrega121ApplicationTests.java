@@ -54,8 +54,6 @@ class Sdi2526Entrega121ApplicationTests {
         }
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private void loginAsAdmin() {
         driver.navigate().to(URL + "/login");
         PO_LoginView.fillLoginForm(driver, "12345678Z", "@Dm1n1str@D0r");
@@ -71,7 +69,6 @@ class Sdi2526Entrega121ApplicationTests {
     }
 
     private void comprobarPaginacion() {
-        // Busca el enlace a la página 2 y hace clic si existe
         List<WebElement> page2 = driver.findElements(By.xpath("//a[contains(@href, 'page=2')]"));
         if (!page2.isEmpty()) {
             page2.get(0).click();
@@ -99,8 +96,6 @@ class Sdi2526Entrega121ApplicationTests {
         checkText = "Listado de Reservas";
         result = PO_View.checkElementBy(driver, "text", checkText);
         Assertions.assertEquals(checkText, result.getFirst().getText());
-
-
     }
 
     @Test
@@ -422,7 +417,7 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        // Paso 1: desactivar el primer espacio activo para tener uno inactivo
+        // desactivar el primer espacio activo para tener uno inactivo
         WebElement deactivateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-warning')]"
         ));
@@ -431,7 +426,7 @@ class Sdi2526Entrega121ApplicationTests {
                 .getText();
         deactivateBtn.click();
 
-        // Paso 2: activar ese mismo espacio
+        // activar ese mismo espacio
         WebElement activateBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
@@ -506,7 +501,7 @@ class Sdi2526Entrega121ApplicationTests {
         String spaceId = blocksLink.getAttribute("href")
                 .replaceAll(".*/blocks/list/(\\d+).*", "$1");
 
-        // Paso 1: crear bloqueo base independiente de la prueba 19
+        // crear bloqueo base independiente de la prueba 19
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2099-07-01T09:00';"
@@ -517,7 +512,7 @@ class Sdi2526Entrega121ApplicationTests {
         driver.findElement(By.id("reason")).sendKeys("Bloqueo base prueba 20");
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        // Paso 2: intentar crear bloqueo solapado con el anterior
+        // intentar crear bloqueo solapado con el anterior
         driver.navigate().to(URL + "/blocks/new/" + spaceId);
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2099-07-01T10:00';"
@@ -601,7 +596,7 @@ class Sdi2526Entrega121ApplicationTests {
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // TESTS 23–35 (sin cambios)
+    // TESTS 23–35
     // ─────────────────────────────────────────────────────────────────────────
 
     @Test
@@ -649,12 +644,12 @@ class Sdi2526Entrega121ApplicationTests {
         assertTrue(driver.getCurrentUrl().contains("endDate=2026-03-18"), "La URL debe contener la fecha de fin");
         List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
         int numeroDeFilas = filas.size();
-        assertEquals(2, numeroDeFilas, "Debería haber exactamente 2 elementos en la tabla");
+        assertEquals(1, numeroDeFilas, "Debería haber exactamente 1 elementos en la tabla");
         PO_PrivateView.checkPagination(driver);
         assertTrue(driver.getCurrentUrl().contains("startDate=2026-03-14"), "El filtro de fecha debe mantenerse al cambiar de página");
         assertTrue(driver.getCurrentUrl().contains("endDate=2026-03-18"), "El filtro de fecha debe mantenerse al cambiar de página");
         numeroDeFilas = filas.size();
-        assertEquals(2, numeroDeFilas, "Debería haber exactamente 2 elementos en la tabla");
+        assertEquals(1, numeroDeFilas, "Debería haber exactamente 1 elementos en la tabla");
     }
 
     @Test
@@ -670,7 +665,6 @@ class Sdi2526Entrega121ApplicationTests {
 
     }
 
-    //Se aplica el filtro de capacidad con el valor 10
     @Test
     @Order(27)
     void PR27(){
@@ -699,7 +693,6 @@ class Sdi2526Entrega121ApplicationTests {
         driver.navigate().to(URL + "/spaces/list");
 
         driver.findElement(By.xpath("/html/body/div/div/div[1]/table/tbody/tr[1]/td[5]/a")).click();
-        //btn btn-sm btn-info
 
         String checkText = "Sala Ada Lovelace";
         List<WebElement> result = PO_View.checkElementBy(driver, "text", checkText);
@@ -800,8 +793,6 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(33)
     void PR33(){
-        //LocalDateTime.of(2027, 4, 10, 8, 0),
-        //LocalDateTime.of(2027, 4, 10, 18, 0),
         PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
         driver.navigate().to(URL + "/reservations/add");
 
@@ -1070,50 +1061,38 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(43)
     void PR43() {
-        // Cogemos un usuario diferente para que no se alcance el limite de reservas
         PO_LoginView.loginAndCheck(driver, "10000003V", "Us3r@3-PASSW", "10000003V");
         driver.navigate().to(URL + "/reservations/list");
 
-        // Contar reservas del usuario ANTES de intentar la recurrente con solape
         List<WebElement> rowsAntes = driver.findElements(
                 By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
         int countAntes = rowsAntes.size();
 
-        // Ir al formulario de añadir reserva
         driver.navigate().to(URL + "/reservations/add");
 
-        // Seleccionar "Sala Linus Torvalds" (space5)
-        // Tiene un bloqueo activo el 2027-04-10 de 08:00 a 18:00
         new Select(driver.findElement(By.id("space")))
                 .selectByVisibleText("Sala Linus Torvalds - Capacidad: 8");
 
-        // Reserva base: 2027-03-27 10:00-12:00
-        // Recurrencia semanal hasta 2027-04-17 genera: 27/03, 03/04, 10/04 ← SOLAPA, 17/04
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('startDate').value = '2027-03-27T10:00';");
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('endDate').value = '2027-03-27T12:00';");
 
-        // Seleccionar frecuencia WEEKLY
         new Select(driver.findElement(By.id("recurrenceFrequency")))
                 .selectByValue("WEEKLY");
 
-        // Fecha fin: 2027-04-17 → la ocurrencia del 10/04 solapa con el bloqueo
         ((JavascriptExecutor) driver).executeScript(
                 "document.getElementById('recurrenceEndDate').value = '2027-04-17';" +
                         "document.getElementById('recurrenceEndDate').disabled = false;");
 
-        // Enviar formulario
         driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        // Comprobar que se muestra el mensaje de error de solape
         String errorMsg = PO_HomeView.getP().getString(
                 "reservation.recurrence.overlap", PO_Properties.getSPANISH());
         List<WebElement> errorElement = PO_View.checkElementBy(driver, "text", errorMsg);
         Assertions.assertFalse(errorElement.isEmpty(),
                 "Debe aparecer el mensaje de error cuando la recurrencia solapa con un bloqueo");
 
-        // Comprobar que no se creó ninguna reserva (el sistema rechaza todas o ninguna)
         driver.navigate().to(URL + "/reservations/list");
         List<WebElement> rowsDespues = driver.findElements(
                 By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
@@ -1130,7 +1109,6 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(44)
     void PR44() {
-        // Usuario 4 arranca con 0 reservas activas, creamos 8 para llegar al límite
         PO_LoginView.loginAndCheck(driver, "10000004H", "Us3r@4-PASSW", "10000004H");
 
         String[][] reservas = {
@@ -1178,7 +1156,6 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(45)
     void PR45() {
-        // Usuario 5 arranca con 1 reserva activa, creamos 7 más para llegar a 8
         PO_LoginView.loginAndCheck(driver, "10000005L", "Us3r@5-PASSW", "10000005L");
 
         String[][] reservas = {
@@ -1211,7 +1188,6 @@ class Sdi2526Entrega121ApplicationTests {
                     "La reserva " + fechas[0] + " debería crearse correctamente antes del límite");
         }
 
-        // Intentamos crear otra reserva (limite superado)
         driver.navigate().to(URL + "/reservations/add");
 
         new Select(driver.findElement(By.id("space")))

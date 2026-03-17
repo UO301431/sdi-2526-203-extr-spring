@@ -28,7 +28,6 @@ import java.util.Locale;
  */
 @Controller
 @RequestMapping("/blocks")
-// Este controlador requiere ser ADMIN para poder utilizarse
 @PreAuthorize("hasRole('ADMIN')")
 public class MaintenanceBlockController {
 
@@ -40,20 +39,6 @@ public class MaintenanceBlockController {
 
     @Autowired
     private MessageSource messageSource;
-
-    /**
-     * Comprueba si el usuario autenticado tiene el rol de administrador.
-     * Se usa en cada método para proteger el acceso a las operaciones de bloqueo.
-     * @return true si el usuario tiene ROLE_ADMIN, false en caso contrario
-     */
-    // ── Helper: comprueba si el usuario autenticado es admin ──────────────────
-    /**
-    private boolean isAdmin() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-    }
-     */
 
     /**
      * Muestra el listado paginado de bloqueos de mantenimiento de un espacio concreto.

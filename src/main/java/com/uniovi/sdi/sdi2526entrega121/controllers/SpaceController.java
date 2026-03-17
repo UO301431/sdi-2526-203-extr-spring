@@ -214,62 +214,6 @@ public class SpaceController {
         return "space/detail";
     }
 
-    // ── Lógica de disponibilidad (pendiente de integrar con la vista unificada) ──
-
-    // Lógica duplicada de lista de espacios disponibles y detalle de espacio
-    /**
-     * Muestra la lista de espacios disponibles
-     * @param searchType, cadena de texto para filtar por tipo
-     * @param searchCapacity, número para filtar por capacidad minima
-     */
-    /*
-    @GetMapping("spaces")
-    public String getList(Model model, Pageable pageable,
-                          @RequestParam(value = "", required = false) String searchType,
-                          @RequestParam(value = "", required = false) Integer searchCapacity){
-
-        Page<Space> activeSpace;
-        boolean hasType = searchType != null && !searchType.isEmpty();
-        boolean hasCapacity = searchCapacity != null;
-
-        //Se comprueba que se ha buscado por tipo y capacidad
-        if(hasType && hasCapacity){
-            activeSpace = spaceService.getActivSpacesByTypeAndCapacity(pageable, searchType, searchCapacity);
-        }
-        //Se comprueba que se ha buscado por tipo
-        else if (hasType) {
-            activeSpace = spaceService.getActiveSpacesByType(pageable, searchType);
-        }
-        //Se comprueba que se ha buscado por capacidad
-        else if (hasCapacity) {
-            activeSpace = spaceService.getActiveSpacesByCapacity(pageable, searchCapacity);
-        }
-        //Se busca sin aplicar ningun filtro
-        else{
-            activeSpace = spaceService.getActiveSpaces(pageable);
-        }
-
-        model.addAttribute("availableSpaceList", activeSpace.getContent());
-        model.addAttribute("page", activeSpace);
-        return "space/list";
-    }
-
-     */
-
-    /**
-     * Se devuelven los detalles del espacio solicitado
-     * @param id, id del espacio del que se consultan los detalles
-     */
-    /*
-    @GetMapping("space/details/{id}")
-    public String getDetail(Model model, @PathVariable Long id){
-        model.addAttribute("space", spaceService.getSpace(id));
-        return "space/details";
-    }
-     */
-
-    // Fin lógica duplicada de lista de espacios disponibles y detalle de espacio
-
     /**
      * Muestra la vista para seleccionar el rango de fechas a consultar para un espacio.
      * @param id identificador del espacio del que se consulta la disponibilidad
