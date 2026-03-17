@@ -945,7 +945,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(42)
     void PR42() {
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000002Q", "Us3r@2-PASSW", "10000002Q");
         driver.navigate().to(URL + "/reservations/list");
 
         List<WebElement> rowsAntes = driver.findElements(
@@ -993,8 +994,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(43)
     void PR43() {
-        // Login como empleado
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000003V", "Us3r@3-PASSW", "10000003V");
         driver.navigate().to(URL + "/reservations/list");
 
         // Contar reservas del usuario ANTES de intentar la recurrente con solape
