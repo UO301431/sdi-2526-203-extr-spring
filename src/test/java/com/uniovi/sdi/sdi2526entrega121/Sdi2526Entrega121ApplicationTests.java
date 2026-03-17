@@ -555,11 +555,11 @@ class Sdi2526Entrega121ApplicationTests {
         PO_View.checkElementBy(driver, "text", "Inicio");
         PO_View.checkElementBy(driver, "text", "Espacio");
         PO_View.checkElementBy(driver, "text", "Fin");
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
+        assertEquals(5, filas.size(), "Debería haber exactamente 5 elementos en la tabla");
         PO_PrivateView.checkPagination(driver);
-        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
-        int numeroDeFilas = filas.size();
-        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
-        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+        filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
+        assertEquals(5, filas.size(), "Debería haber exactamente 5 elementos en la tabla");
     }
 
     @Test
@@ -569,13 +569,12 @@ class Sdi2526Entrega121ApplicationTests {
         driver.navigate().to(URL + "/reservations/list");
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"spaceId\"]/option[2]", 0);
         driver.findElement(By.xpath("//*[@id=\"main-container\"]/form/button")).click();
-        assertTrue(driver.getCurrentUrl().contains("spaceId="), "La URL debe contener el filtro por espacio");
+        assertTrue(driver.getCurrentUrl().contains("spaceId=1"), "La URL debe contener el filtro por espacio");
         PO_PrivateView.checkPagination(driver);
-        assertTrue(driver.getCurrentUrl().contains("spaceId="), "El filtro de espacio debe mantenerse al cambiar de página");
-        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody"));
+        assertTrue(driver.getCurrentUrl().contains("spaceId=1"), "El filtro de espacio debe mantenerse al cambiar de página");
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
         int numeroDeFilas = filas.size();
-        assertEquals(5, numeroDeFilas, "Debería haber exactamente 5 elementos en la tabla");
-        assertTrue(numeroDeFilas > 0, "La tabla no debería estar vacía");
+        assertEquals(3, numeroDeFilas, "Debería haber exactamente 3 elementos en la tabla");
     }
 
     @Test
@@ -588,10 +587,16 @@ class Sdi2526Entrega121ApplicationTests {
         PO_PrivateView.findAndClick(driver, "free",
                 "//form[@action='/reservations/list']//button[@type='submit']", 0);
         try { Thread.sleep(2500); } catch (InterruptedException ignored) {}
-        assertTrue(driver.getCurrentUrl().contains("startDate="), "La URL debe contener la fecha de inicio");
-        assertTrue(driver.getCurrentUrl().contains("endDate="), "La URL debe contener la fecha de fin");
+        assertTrue(driver.getCurrentUrl().contains("startDate=2026-03-14"), "La URL debe contener la fecha de inicio");
+        assertTrue(driver.getCurrentUrl().contains("endDate=2026-03-18"), "La URL debe contener la fecha de fin");
+        List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
+        int numeroDeFilas = filas.size();
+        assertEquals(2, numeroDeFilas, "Debería haber exactamente 2 elementos en la tabla");
         PO_PrivateView.checkPagination(driver);
-        assertTrue(driver.getCurrentUrl().contains("startDate="), "El filtro de fecha debe mantenerse al cambiar de página");
+        assertTrue(driver.getCurrentUrl().contains("startDate=2026-03-14"), "El filtro de fecha debe mantenerse al cambiar de página");
+        assertTrue(driver.getCurrentUrl().contains("endDate=2026-03-18"), "El filtro de fecha debe mantenerse al cambiar de página");
+        numeroDeFilas = filas.size();
+        assertEquals(2, numeroDeFilas, "Debería haber exactamente 2 elementos en la tabla");
     }
 
     @Test
