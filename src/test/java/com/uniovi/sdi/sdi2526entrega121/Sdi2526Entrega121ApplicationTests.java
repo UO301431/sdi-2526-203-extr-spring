@@ -1011,7 +1011,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(42)
     void PR42() {
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000002Q", "Us3r@2-PASSW", "10000002Q");
         driver.navigate().to(URL + "/reservations/list");
 
         List<WebElement> rowsAntes = driver.findElements(
@@ -1059,8 +1060,8 @@ class Sdi2526Entrega121ApplicationTests {
     @Test
     @Order(43)
     void PR43() {
-        // Login como empleado
-        PO_LoginView.loginAndCheck(driver, "10000001S", "Us3r@1-PASSW", "10000001S");
+        // Cogemos un usuario diferente para que no se alcance el limite de reservas
+        PO_LoginView.loginAndCheck(driver, "10000003V", "Us3r@3-PASSW", "10000003V");
         driver.navigate().to(URL + "/reservations/list");
 
         // Contar reservas del usuario ANTES de intentar la recurrente con solape
@@ -1110,6 +1111,114 @@ class Sdi2526Entrega121ApplicationTests {
 
         Assertions.assertEquals(countAntes, countDespues,
                 "El número de reservas no debe haber aumentado si hubo un solape");
+
+        PO_LoginView.logout(driver);
+    }
+
+    // [Prueba 44] Crear reservas hasta alcanzar el límite y comprobar que
+    // se registran correctamente.
+    @Test
+    @Order(44)
+    void PR44() {
+        // Usuario 4 arranca con 0 reservas activas, creamos 8 para llegar al límite
+        PO_LoginView.loginAndCheck(driver, "10000004H", "Us3r@4-PASSW", "10000004H");
+
+        String[][] reservas = {
+                {"2040-07-01T09:00", "2040-07-01T10:00"},
+                {"2040-07-02T09:00", "2040-07-02T10:00"},
+                {"2040-07-03T09:00", "2040-07-03T10:00"},
+                {"2040-07-04T09:00", "2040-07-04T10:00"},
+                {"2040-07-05T09:00", "2040-07-05T10:00"},
+                {"2040-07-06T09:00", "2040-07-06T10:00"},
+                {"2040-07-07T09:00", "2040-07-07T10:00"},
+                {"2040-07-08T09:00", "2040-07-08T10:00"}
+        };
+
+        for (String[] fechas : reservas) {
+            driver.navigate().to(URL + "/reservations/add");
+
+            new Select(driver.findElement(By.id("space")))
+                    .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('startDate').value = '" + fechas[0] + "';");
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('endDate').value = '" + fechas[1] + "';");
+
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+            String successMsg = PO_HomeView.getP().getString(
+                    "reservation.add.success", PO_Properties.getSPANISH());
+            List<WebElement> success = PO_View.checkElementBy(driver, "text", successMsg);
+            Assertions.assertFalse(success.isEmpty(),
+                    "La reserva " + fechas[0] + " debería crearse correctamente");
+        }
+
+        driver.navigate().to(URL + "/reservations/list");
+        List<WebElement> rows = driver.findElements(
+                By.xpath("//*[@id='tableReservation']/table/tbody/tr"));
+        Assertions.assertEquals(5, rows.size(),
+                "El listado debe mostrar 5 filas (primera página llena con 8 reservas)");
+
+        PO_LoginView.logout(driver);
+    }
+
+    // [Prueba 45] Intentar crear una reserva adicional superando el límite
+    // y comprobar que el sistema la rechaza con un mensaje claro.
+    @Test
+    @Order(45)
+    void PR45() {
+        // Usuario 5 arranca con 1 reserva activa, creamos 7 más para llegar a 8
+        PO_LoginView.loginAndCheck(driver, "10000005L", "Us3r@5-PASSW", "10000005L");
+
+        String[][] reservas = {
+                {"2040-08-01T09:00", "2040-08-01T10:00"},
+                {"2040-08-02T09:00", "2040-08-02T10:00"},
+                {"2040-08-03T09:00", "2040-08-03T10:00"},
+                {"2040-08-04T09:00", "2040-08-04T10:00"},
+                {"2040-08-05T09:00", "2040-08-05T10:00"},
+                {"2040-08-06T09:00", "2040-08-06T10:00"},
+                {"2040-08-07T09:00", "2040-08-07T10:00"}
+        };
+
+        for (String[] fechas : reservas) {
+            driver.navigate().to(URL + "/reservations/add");
+
+            new Select(driver.findElement(By.id("space")))
+                    .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('startDate').value = '" + fechas[0] + "';");
+            ((JavascriptExecutor) driver).executeScript(
+                    "document.getElementById('endDate').value = '" + fechas[1] + "';");
+
+            driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+            String successMsg = PO_HomeView.getP().getString(
+                    "reservation.add.success", PO_Properties.getSPANISH());
+            List<WebElement> success = PO_View.checkElementBy(driver, "text", successMsg);
+            Assertions.assertFalse(success.isEmpty(),
+                    "La reserva " + fechas[0] + " debería crearse correctamente antes del límite");
+        }
+
+        // Intentamos crear otra reserva (limite superado)
+        driver.navigate().to(URL + "/reservations/add");
+
+        new Select(driver.findElement(By.id("space")))
+                .selectByVisibleText("Despacho 404 - Capacidad: 4");
+
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('startDate').value = '2040-08-10T09:00';");
+        ((JavascriptExecutor) driver).executeScript(
+                "document.getElementById('endDate').value = '2040-08-10T10:00';");
+
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+        String errorMsg = PO_HomeView.getP().getString(
+                "reservation.limit.reached", PO_Properties.getSPANISH());
+        List<WebElement> error = PO_View.checkElementBy(driver, "text", errorMsg);
+        Assertions.assertFalse(error.isEmpty(),
+                "Debe aparecer el mensaje de límite alcanzado al intentar crear la 9ª reserva activa");
 
         PO_LoginView.logout(driver);
     }
