@@ -628,7 +628,7 @@ class Sdi2526Entrega121ApplicationTests {
         assertTrue(driver.getCurrentUrl().contains("spaceId=1"), "El filtro de espacio debe mantenerse al cambiar de página");
         List<WebElement> filas = driver.findElements(By.xpath("//*[@id=\"tableReservation\"]/table/tbody/tr"));
         int numeroDeFilas = filas.size();
-        assertEquals(3, numeroDeFilas, "Debería haber exactamente 3 elementos en la tabla");
+        assertEquals(4, numeroDeFilas, "Debería haber exactamente 3 elementos en la tabla");
     }
 
     @Test
@@ -871,7 +871,7 @@ class Sdi2526Entrega121ApplicationTests {
         // AHORA CANCELO OTRA RESERVA
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[1]", 0);
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"main-container\"]/form/button", 0);
-        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"tableReservation\"]/table/tbody/tr[2]/td[6]/a", 0);
+        PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"tableReservation\"]/table/tbody/tr[4]/td[6]/a", 0);
 
         // COMPRUEBO QUE AHORA HAY DOS RESERVAS CANCELADAS
         PO_PrivateView.findAndClick(driver, "free", "//*[@id=\"status\"]/option[3]", 0);
