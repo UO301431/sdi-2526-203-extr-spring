@@ -39,13 +39,32 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/images/**", "/script/**", "/", "/signup",
                                 "/login/**").permitAll()
-                        .requestMatchers("/reservations/export",
-                                "/toggle/*",
+                        .requestMatchers("/reservations/export").hasAnyRole("ADMIN")
+                        .requestMatchers(
+                                "/reservations/list",
+                                "/reservations/update"
+                        ).hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers(
+                                "/reservations/add",
+                                "/reservations/cancel/**"
+                        ).hasAnyRole("EMPLOYEE")
+                        .requestMatchers(
                                 "/spaces/new",
-                                "/spaces/edit/*",
-                                "/spaces/list/*",
-                                "/spaces/new/*").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/reservations/add").hasAuthority("ROLE_EMPLOYEE")
+                                "/spaces/edit/**",
+                                "/spaces/toggle/**",
+                                "/spaces/update"
+                        ).hasAnyRole("ADMIN")
+                        .requestMatchers(
+                                "/spaces/list",
+                                "/spaces/detail/**",
+                                "/space/availability/**",
+                                "/spaces/availability/**"
+                        ).hasAnyRole("ADMIN", "EMPLOYEE")
+                        .requestMatchers("/blocks/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/home",
+                                "/profile/**"
+                        ).authenticated()
                         .anyRequest().authenticated()
                 )
                 .csrf(csrf -> csrf.disable())
