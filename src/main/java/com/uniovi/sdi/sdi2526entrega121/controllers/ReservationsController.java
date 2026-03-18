@@ -5,7 +5,6 @@ import com.uniovi.sdi.sdi2526entrega121.entities.Reservation;
 import com.uniovi.sdi.sdi2526entrega121.entities.ReservationStatus;
 import com.uniovi.sdi.sdi2526entrega121.entities.User;
 import com.uniovi.sdi.sdi2526entrega121.entities.RecurringResult;
-import com.uniovi.sdi.sdi2526entrega121.services.ReservaSecurityService;
 import com.uniovi.sdi.sdi2526entrega121.services.ReservationsService;
 import com.uniovi.sdi.sdi2526entrega121.services.SpaceService;
 import com.uniovi.sdi.sdi2526entrega121.services.UsersService;
@@ -41,9 +40,6 @@ public class ReservationsController {
 
     @Autowired
     private ReservationsService reservationsService;
-
-    @Autowired
-    private ReservaSecurityService reservaSecurityService;
 
     @Autowired
     private SpaceService spaceService;

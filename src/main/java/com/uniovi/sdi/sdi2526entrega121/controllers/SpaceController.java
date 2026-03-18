@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -39,13 +40,14 @@ public class SpaceController {
 
     /**
      * Comprueba si el usuario autenticado tiene el rol de administrador.
-     * Se usa en cada método que requiere permisos de admin.
+     * Se usa en cada metodo que requiere permisos de admin.
      * @return true si el usuario tiene ROLE_ADMIN, false en caso contrario
      */
     private boolean isAdmin() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        assert auth != null;
         return auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> Objects.equals(a.getAuthority(), "ROLE_ADMIN"));
     }
 
     /**
