@@ -75,7 +75,7 @@ public class SpaceService {
         Optional<Space> existing = spaceRepository.findActiveByNameExcluding(
                 space.getName().trim(), -1L
         );
-        if (!existing.isEmpty()) {
+        if (existing.isPresent()) {
 
             return "space.error.name.duplicate";
 

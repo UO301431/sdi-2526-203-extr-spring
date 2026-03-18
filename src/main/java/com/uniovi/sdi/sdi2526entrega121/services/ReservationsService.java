@@ -74,12 +74,12 @@ public class ReservationsService {
         LocalDateTime tmpStart = currentStart;
         while (!tmpStart.toLocalDate().isAfter(endDate)) {
             occurrences++;
-            switch (frequency) {
-                case DAILY:   tmpStart = tmpStart.plusDays(1); break;
-                case WEEKLY:  tmpStart = tmpStart.plusWeeks(1); break;
-                case MONTHLY: tmpStart = tmpStart.plusMonths(1); break;
-                case YEARLY:  tmpStart = tmpStart.plusYears(1); break;
-            }
+            tmpStart = switch (frequency) {
+                case DAILY -> tmpStart.plusDays(1);
+                case WEEKLY -> tmpStart.plusWeeks(1);
+                case MONTHLY -> tmpStart.plusMonths(1);
+                case YEARLY -> tmpStart.plusYears(1);
+            };
         }
         if (currentActive + occurrences > maxActiveReservations) {
             return RecurringResult.LIMIT_REACHED;
@@ -114,25 +114,17 @@ public class ReservationsService {
             r.setRecurrenceEndDate(endDate);
             toSave.add(r);
 
-            switch (frequency) {
-                case DAILY:
-                    currentStart = currentStart.plusDays(1);
-                    break;
-                case WEEKLY:
-                    currentStart = currentStart.plusWeeks(1);
-                    break;
-                case MONTHLY:
-                    currentStart = currentStart.plusMonths(1);
-                    break;
-                case YEARLY:
-                    currentStart = currentStart.plusYears(1);
-                    break;
-            }
+            currentStart = switch (frequency) {
+                case DAILY -> currentStart.plusDays(1);
+                case WEEKLY -> currentStart.plusWeeks(1);
+                case MONTHLY -> currentStart.plusMonths(1);
+                case YEARLY -> currentStart.plusYears(1);
+            };
             currentEnd = currentStart.plusMinutes(durationMinutes);
         }
 
         reservationRepository.saveAll(toSave);
-        Long groupId = toSave.get(0).getId();
+        Long groupId = toSave.getFirst().getId();
         for (Reservation r : toSave) {
             r.setRecurrenceGroupId(groupId);
         }
