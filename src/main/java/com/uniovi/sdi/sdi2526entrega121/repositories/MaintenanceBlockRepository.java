@@ -13,15 +13,12 @@ import java.util.List;
 
 public interface MaintenanceBlockRepository extends JpaRepository<MaintenanceBlock, Long> {
 
-    // All blocks for a space
     Page<MaintenanceBlock> findBySpaceId(Long spaceId, Pageable pageable);
 
     List<MaintenanceBlock> findBySpaceId(Long spaceId);
 
-    // Active blocks for a space
     List<MaintenanceBlock> findBySpaceIdAndStatus(Long spaceId, BlockStatus status);
 
-    // Check overlap with other ACTIVE blocks for the same space
     @Query("SELECT mb FROM MaintenanceBlock mb " +
             "WHERE mb.space.id = :spaceId " +
             "AND mb.status = 'ACTIVE' " +

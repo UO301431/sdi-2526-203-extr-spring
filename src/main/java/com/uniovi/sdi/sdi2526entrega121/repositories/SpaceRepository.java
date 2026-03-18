@@ -13,10 +13,8 @@ import java.util.Optional;
 
 public interface SpaceRepository extends JpaRepository<Space, Long> {
 
-    // All active spaces (for standard user listing)
     Page<Space> findByActiveTrue(Pageable pageable);
 
-    // Active spaces with optional filters (type and/or min capacity)
     @Query("SELECT s FROM Space s WHERE s.active = true " +
             "AND (:type IS NULL OR s.type = :type) " +
             "AND (:minCapacity IS NULL OR s.capacity >= :minCapacity)")
@@ -24,15 +22,12 @@ public interface SpaceRepository extends JpaRepository<Space, Long> {
                                     @Param("minCapacity") Integer minCapacity,
                                     Pageable pageable);
 
-    // All spaces (for admin)
     Page<Space> findAll(Pageable pageable);
 
-    // Check duplicate active name (excluding a given id for edits)
     @Query("SELECT s FROM Space s WHERE s.active = true AND s.name = :name AND (:excludeId IS NULL OR s.id <> :excludeId)")
     Optional<Space> findActiveByNameExcluding(@Param("name") String name,
                                               @Param("excludeId") Long excludeId);
 
-    // All active spaces as list (for dropdowns)
     List<Space> findByActiveTrue();
 
 }
