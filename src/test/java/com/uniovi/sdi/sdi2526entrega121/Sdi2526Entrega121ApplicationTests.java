@@ -381,7 +381,6 @@ class Sdi2526Entrega121ApplicationTests {
         loginAsAdmin();
         driver.navigate().to(URL + "/spaces/list");
 
-        // Localizar el primer botón "Desactivar" y el nombre del espacio en su fila
         WebElement deactivateBtn = driver.findElement(By.xpath(
                 "//button[contains(@class,'btn-toggle') and contains(@class,'btn-warning')]"
         ));
@@ -391,16 +390,14 @@ class Sdi2526Entrega121ApplicationTests {
 
         deactivateBtn.click();
 
-        // Verificar que el botón cambió a verde (estado: inactivo → botón Activar)
         WebElement toggleBtn = driver.findElement(By.xpath(
                 "//tr[td[1][normalize-space()='" + spaceName + "']]//button[contains(@class,'btn-toggle')]"
         ));
         assertTrue(
-                toggleBtn.getAttribute("class").contains("btn-success"),
-                "Tras desactivar, el botón debe cambiar a verde (Activar)"
+                toggleBtn.getText().contains("Activar") || toggleBtn.getText().contains("Activate"),
+                "Tras desactivar, el botón debe mostrar el texto Activar"
         );
 
-        // Verificar que el espacio no aparece en el listado de usuario estándar
         driver.manage().deleteAllCookies();
         loginAsUser();
         driver.navigate().to(URL + "/spaces/list");
