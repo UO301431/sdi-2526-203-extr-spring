@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.uniovi.sdi</groupId>
-    <artifactId>sdi2526-entrega1-21</artifactId>
+    <artifactId>sdi2526-203-extr-spring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>sdi2526-entrega1-21</name>
